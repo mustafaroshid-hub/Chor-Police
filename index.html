@@ -1,0 +1,2582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Chor Police — Catch the Thief</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   CHOR POLICE — styles
+   Palette: deep navy/charcoal + warm gold, dark wood accents
+   ============================================================ */
+
+:root {
+  --bg-deep: #10151f;
+  --bg-panel: #1a2130;
+  --bg-panel-2: #212a3d;
+  --gold: #e8b74d;
+  --gold-soft: #f2cf7e;
+  --wood: #3a2418;
+  --wood-light: #5c3a24;
+  --text: #f2ede2;
+  --text-dim: #a9b0c3;
+  --green: #4caf7d;
+  --red: #d9634f;
+  --radius-lg: 22px;
+  --radius-md: 14px;
+  --font-display: 'Poppins', 'Nunito', sans-serif;
+  --font-body: 'Inter', 'DM Sans', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0; height: 100%;
+  background: radial-gradient(circle at 50% -10%, #1c2740 0%, var(--bg-deep) 55%);
+  color: var(--text);
+  font-family: var(--font-body);
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#app { max-width: 520px; margin: 0 auto; min-height: 100vh; position: relative; }
+
+.screen {
+  display: none;
+  min-height: 100vh;
+  padding: 24px 20px 100px;
+  animation: fadeIn 0.35s ease;
+}
+.screen.active { display: block; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+h1, h2, h3 { font-family: var(--font-display); margin: 0 0 6px; letter-spacing: 0.02em; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  border: none;
+  border-radius: 999px;
+  padding: 16px 22px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+  position: relative;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.btn:active { transform: scale(0.96); }
+.btn-primary {
+  background: linear-gradient(180deg, #fbe0a0, var(--gold-soft) 45%, var(--gold) 100%);
+  color: #241704;
+  box-shadow: 0 2px 0 #a97c1f inset, 0 8px 20px rgba(232, 183, 77, 0.4);
+  border: 1px solid #fff3d6;
+}
+.btn-secondary {
+  background: linear-gradient(180deg, #29344c, var(--bg-panel-2));
+  color: var(--text); border: 1px solid #3d4a6b;
+  box-shadow: 0 2px 0 rgba(0,0,0,0.3) inset, 0 4px 10px rgba(0,0,0,0.3);
+}
+.btn-ghost { background: transparent; color: var(--text-dim); font-weight: 500; box-shadow: none; }
+.btn-danger { background: linear-gradient(180deg, #e07a68, var(--red)); color: #fff; }
+.btn-lg { padding: 20px; font-size: 18px; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-row { display: flex; gap: 12px; }
+
+/* ---------- Home ---------- */
+.home-hero { text-align: center; padding: 40px 0 20px; }
+.home-title {
+  font-size: 46px; font-weight: 800; font-family: var(--font-display);
+  color: var(--gold-soft); letter-spacing: 0.01em;
+  background: linear-gradient(180deg, #fff3d6 0%, var(--gold-soft) 45%, var(--gold) 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 3px 0 #7a4f12) drop-shadow(0 8px 22px rgba(232,183,77,0.45));
+  margin-bottom: 4px;
+}
+.home-subtitle { color: var(--text-dim); font-size: 15px; margin-bottom: 30px; }
+.home-icon-cluster { font-size: 46px; margin-bottom: 10px; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.5)); }
+.home-buttons { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
+.home-buttons .btn small { display: block; font-weight: 400; opacity: 0.75; font-size: 12px; }
+.home-footer-links { display: flex; justify-content: center; gap: 24px; margin-top: 30px; }
+.home-footer-links a { color: var(--text-dim); text-decoration: none; font-size: 13px; }
+.home-overview { margin-top: 30px; }
+.home-overview .overview-text { color: var(--text-dim); font-size: 13px; line-height: 1.6; margin: 0; }
+
+/* ---------- Panels / Cards (UI, not game cards) ---------- */
+.panel {
+  background: linear-gradient(180deg, #1e2637, var(--bg-panel));
+  border: 1px solid #2a3450;
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+.panel-title { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold-soft); margin-bottom: 12px; }
+
+/* ---------- Stepper ---------- */
+.stepper { display: flex; align-items: center; justify-content: space-between; background: var(--bg-panel-2); border-radius: var(--radius-md); padding: 10px 14px; }
+.stepper button { width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--bg-deep); color: var(--gold-soft); font-size: 20px; cursor: pointer; }
+.stepper .stepper-value { font-size: 22px; font-weight: 700; font-family: var(--font-display); }
+
+/* ---------- Card editor: visual card tiles (setup screen) ---------- */
+#card-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 4px; }
+.card-tile {
+  position: relative; border-radius: 14px; padding: 12px 8px 10px; text-align: center;
+  border: 2px solid #2a3450; display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+.card-tile.type-police { background: linear-gradient(160deg, #21385c, #16233a); border-color: #3a6ea8; }
+.card-tile.type-thief { background: linear-gradient(160deg, #4a2320, #2a1210); border-color: #8a453d; }
+.card-tile.type-normal { background: var(--bg-panel-2); }
+.card-tile-icon { width: 56px; height: 78px; margin: 0 auto; border-radius: 6px; overflow: hidden; box-shadow: 0 3px 8px rgba(0,0,0,0.4); }
+.card-tile-icon svg { width: 100%; height: 100%; display: block; }
+.card-tile-name {
+  width: 100%; text-align: center; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px; color: var(--text); font-size: 12px; font-weight: 700; padding: 4px 2px;
+}
+.card-tile-value {
+  width: 70%; text-align: center; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px; color: var(--gold-soft); font-size: 12px; font-weight: 700; padding: 3px 2px;
+}
+.card-tile-reveal, .card-tile-reveal-fixed { font-size: 10px; color: var(--text-dim); }
+.card-tile-reveal input { width: 14px; height: 14px; vertical-align: middle; margin-right: 3px; }
+.card-tile-remove {
+  position: absolute; top: 4px; right: 6px; background: none; border: none; color: var(--red);
+  font-size: 14px; cursor: pointer; line-height: 1;
+}
+.add-card-form { display: grid; grid-template-columns: 1fr 90px; gap: 8px; margin-top: 12px; }
+.add-card-form input { background: var(--bg-deep); border: 1px solid #2a3450; border-radius: 8px; color: var(--text); padding: 10px; font-size: 13px; width: 100%; }
+.new-card-preview-wrap { display: flex; justify-content: center; margin-bottom: 8px; }
+
+.reveal-row {
+  display: flex; align-items: center; justify-content: space-between; padding: 10px 4px;
+  border-bottom: 1px solid #253048;
+}
+.reveal-row:last-child { border-bottom: none; }
+.reveal-row.locked span:first-child { color: var(--text-dim); }
+.reveal-tag { font-size: 10px; font-weight: 700; border-radius: 999px; padding: 3px 10px; letter-spacing: 0.03em; }
+.reveal-tag.always { color: var(--gold-soft); background: rgba(232,183,77,0.12); border: 1px solid var(--gold); }
+.reveal-tag.never { color: var(--red); background: rgba(217,99,79,0.12); border: 1px solid var(--red); }
+
+.toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #253048; }
+.toggle-row:last-child { border-bottom: none; }
+input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--gold); }
+input[type=range] { width: 120px; accent-color: var(--gold); }
+
+/* ---------- Premium pill toggle switches ---------- */
+input[type=checkbox].switch {
+  appearance: none; -webkit-appearance: none; width: 46px; height: 27px; border-radius: 999px;
+  background: #2a3450; border: 1px solid #3a466b; position: relative; cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease; flex-shrink: 0;
+}
+input[type=checkbox].switch::before {
+  content: ''; position: absolute; top: 2px; left: 2px; width: 21px; height: 21px; border-radius: 50%;
+  background: #c7cbe0; transition: transform 0.2s ease, background 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+input[type=checkbox].switch:checked { background: var(--gold); border-color: var(--gold-soft); }
+input[type=checkbox].switch:checked::before { transform: translateX(19px); background: #241704; }
+
+/* ---------- Lobby ---------- */
+.room-code-display { text-align: center; padding: 20px 0; }
+.room-code-display .code { font-size: 40px; font-weight: 800; letter-spacing: 0.12em; color: var(--gold-soft); font-family: var(--font-display); }
+.lobby-player { display: flex; align-items: center; gap: 10px; padding: 8px 14px; background: var(--bg-panel-2); border-radius: var(--radius-md); margin-bottom: 8px; }
+.lobby-player-avatar { width: 34px; height: 34px; border-radius: 50%; overflow: hidden; background: var(--bg-deep); flex-shrink: 0; }
+.lobby-player-avatar svg { width: 100%; height: 100%; display: block; }
+.lobby-player-name { flex: 1; }
+.lobby-ready-tag {
+  font-size: 10px; font-weight: 700; color: var(--green); background: rgba(76,175,125,0.15);
+  border: 1px solid var(--green); border-radius: 999px; padding: 3px 9px; letter-spacing: 0.03em;
+}
+
+/* ---------- Game screen: the table ---------- */
+.round-banner { text-align: center; color: var(--gold-soft); font-family: var(--font-display); font-weight: 700; letter-spacing: 0.08em; margin-bottom: 14px; }
+.stage { display: none; }
+.stage.active { display: block; animation: fadeIn 0.3s ease; }
+
+.board-status {
+  text-align: center; font-family: var(--font-display); font-weight: 700; font-size: 15px;
+  color: var(--gold-soft); min-height: 44px; display: flex; align-items: center; justify-content: center;
+  padding: 8px 10px; line-height: 1.4;
+}
+
+.game-table {
+  position: relative; width: 100%; max-width: 460px; aspect-ratio: 3 / 4; margin: 6px auto 0;
+  border-radius: 50% / 38%;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 55%, rgba(0,0,0,0.25) 80%),
+    repeating-radial-gradient(circle at 50% 45%, rgba(0,0,0,0.06) 0 2px, transparent 2px 5px),
+    radial-gradient(ellipse at 50% 40%, var(--wood-light) 0%, var(--wood) 65%, #22140c 100%);
+  box-shadow:
+    inset 0 0 60px rgba(0,0,0,0.6), inset 0 0 3px rgba(232,183,77,0.5),
+    0 16px 38px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.4);
+  border: 4px solid;
+  border-image: linear-gradient(180deg, #6a4526, #3a2414) 1;
+}
+
+.table-center { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; }
+
+.shuffle-deck { position: relative; width: 70px; height: 100px; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.5)); }
+.shuffle-deck .deck-card {
+  position: absolute; inset: 0; border-radius: 10px;
+  background: linear-gradient(160deg, #34406366, #171e30);
+  background: linear-gradient(160deg, #354063, #171e30);
+  border: 2px solid var(--gold);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.5);
+  animation: shuffleMove 1.4s ease-in-out infinite;
+}
+.shuffle-deck .deck-card:nth-child(1) { animation-delay: 0s; }
+.shuffle-deck .deck-card:nth-child(2) { animation-delay: 0.15s; }
+.shuffle-deck .deck-card:nth-child(3) { animation-delay: 0.3s; }
+@keyframes shuffleMove {
+  0% { transform: translate(0,0) rotate(0deg); }
+  25% { transform: translate(-11px, -5px) rotate(-8deg); }
+  50% { transform: translate(8px, 3px) rotate(6deg); }
+  75% { transform: translate(-5px, 6px) rotate(-3deg); }
+  100% { transform: translate(0,0) rotate(0deg); }
+}
+
+/* Static stacked deck shown once shuffling is done — no jitter, so it
+   doesn't look like the deck is still "thinking" during later stages. */
+.idle-deck { position: relative; width: 62px; height: 88px; filter: drop-shadow(0 5px 8px rgba(0,0,0,0.45)); }
+.idle-deck .deck-card {
+  position: absolute; border-radius: 9px;
+  background: linear-gradient(160deg, #354063, #171e30);
+  border: 2px solid var(--gold);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+}
+.idle-deck .deck-card:nth-child(1) { inset: 4px -4px -4px 4px; opacity: 0.5; }
+.idle-deck .deck-card:nth-child(2) { inset: 2px -2px -2px 2px; opacity: 0.75; }
+.idle-deck .deck-card:nth-child(3) { inset: 0; }
+
+/* "Thinking..." indicator shown on whoever (bot or player) is deciding,
+   replacing the old behavior of leaving the shuffle animation running. */
+.slot-thinking {
+  position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 3px; background: var(--bg-panel); border: 1px solid var(--gold);
+  border-radius: 999px; padding: 4px 7px; z-index: 4;
+}
+.slot-thinking span {
+  width: 4px; height: 4px; border-radius: 50%; background: var(--gold-soft);
+  animation: thinkBounce 1s ease-in-out infinite;
+}
+.slot-thinking span:nth-child(2) { animation-delay: 0.15s; }
+.slot-thinking span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes thinkBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(-3px); opacity: 1; }
+}
+
+/* ---------- Player slots seated around the table ---------- */
+.player-slot {
+  position: absolute; transform: translate(-50%, -50%); width: 78px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center;
+}
+.player-slot.is-me { z-index: 3; }
+.player-slot.is-me .slot-avatar { width: 54px; height: 54px; border-width: 3px; box-shadow: 0 0 0 3px rgba(232,183,77,0.2), 0 4px 10px rgba(0,0,0,0.5); }
+.player-slot.is-me .slot-name { font-size: 11px; }
+.player-slot.deal-anim { animation: dealIn 0.55s cubic-bezier(0.2,0.7,0.3,1) both; }
+@keyframes dealIn {
+  0% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.35); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.slot-avatar-wrap { position: relative; }
+.slot-avatar {
+  width: 46px; height: 46px; border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, #3a4770, var(--bg-panel-2) 70%);
+  border: 2px solid #3a466b; display: flex; align-items: center; justify-content: center;
+  font-size: 21px; box-shadow: 0 3px 8px rgba(0,0,0,0.45), 0 0 0 3px rgba(0,0,0,0.25);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+.player-slot.is-police .slot-avatar {
+  border-color: var(--gold); box-shadow: 0 0 0 3px rgba(232,183,77,0.25), 0 0 16px rgba(232,183,77,0.75);
+  animation: policePulse 1.6s ease-in-out infinite;
+}
+.player-slot.is-thief-revealed .slot-avatar {
+  border-color: var(--red); box-shadow: 0 0 0 3px rgba(217,99,79,0.25), 0 0 16px rgba(217,99,79,0.7);
+}
+@keyframes policePulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(232,183,77,0.25), 0 0 12px rgba(232,183,77,0.6); }
+  50% { box-shadow: 0 0 0 5px rgba(232,183,77,0.15), 0 0 20px rgba(232,183,77,0.9); }
+}
+.slot-badge {
+  position: absolute; top: -8px; right: -6px; font-size: 15px;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.6));
+}
+.slot-name {
+  font-size: 10px; font-weight: 700; color: var(--text);
+  max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.slot-score { font-size: 9px; color: var(--gold-soft); font-weight: 600; margin-top: -2px; }
+
+.player-slot.selectable .slot-avatar { cursor: pointer; }
+.player-slot.selectable .slot-avatar:active { transform: scale(0.92); }
+.player-slot.selected .slot-avatar { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+/* ---------- Premium playing cards ---------- */
+.mini-card {
+  width: 52px; height: 73px; border-radius: 8px; margin-top: 2px; perspective: 600px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(160deg, #2b3654, #171e30);
+  border: 2px solid #3a466b;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+  transition: transform 0.5s cubic-bezier(0.2,0.7,0.3,1);
+  transform-style: preserve-3d;
+}
+.mini-card.card-back { border-color: #3a466b; }
+.mini-card.flip-in { border-color: var(--gold); box-shadow: 0 3px 10px rgba(232,183,77,0.35); animation: cardFlip 0.5s ease; }
+@keyframes cardFlip {
+  0% { transform: rotateY(90deg); }
+  100% { transform: rotateY(0deg); }
+}
+.card-back-face {
+  font-size: 18px; opacity: 0.85; width: 100%; height: 100%; border-radius: 5px;
+  background:
+    repeating-linear-gradient(45deg, rgba(232,183,77,0.14) 0 3px, transparent 3px 7px),
+    radial-gradient(circle at 50% 50%, #22304d, #14192a);
+  display: flex; align-items: center; justify-content: center;
+}
+.card-face {
+  position: relative; width: 100%; height: 100%; border-radius: 6px;
+  overflow: hidden;
+}
+.card-face .card-art { position: absolute; inset: 0; }
+.card-face .card-art svg { width: 100%; height: 100%; display: block; }
+.card-face .card-name {
+  position: absolute; left: 3px; right: 3px; bottom: 3px;
+  font-size: 6.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; color: var(--gold-soft);
+  background: rgba(8,10,16,0.6); border-radius: 3px; padding: 1.5px 2px; text-align: center;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.card-face .card-value {
+  position: absolute; top: 2px; right: 2px; font-size: 8px; font-weight: 800; color: #241704;
+  background: linear-gradient(180deg, var(--gold-soft), var(--gold)); border-radius: 50%;
+  width: 15px; height: 15px; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.4);
+}
+.card-face .card-value.card-value-special { padding: 3px; }
+.card-face .card-value.card-value-special svg { width: 100%; height: 100%; display: block; }
+
+/* Larger card face variant used in the "your card" reveal moment */
+.big-card-face { width: 130px; height: 182px; margin: 12px auto 0; }
+.big-card-face .card-name { font-size: 13px; padding: 3px; bottom: 6px; left: 6px; right: 6px; }
+.big-card-face .card-value { font-size: 15px; width: 30px; height: 30px; top: 6px; right: 6px; }
+
+.slot-badge-secondary {
+  position: absolute; top: -8px; left: -6px; width: 16px; height: 16px;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.6));
+}
+.slot-badge-secondary svg { width: 100%; height: 100%; display: block; }
+.slot-avatar { overflow: hidden; }
+.slot-avatar svg { width: 100%; height: 100%; display: block; }
+
+/* ---------- Icon picker (custom card creation) ---------- */
+.icon-picker { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px; margin-top: 8px; }
+.icon-picker-btn {
+  flex: 0 0 auto; width: 36px; height: 50px; border-radius: 6px; padding: 0; overflow: hidden;
+  background: var(--bg-deep); border: 2px solid #2a3450; cursor: pointer;
+}
+.icon-picker-btn svg { width: 100%; height: 100%; display: block; }
+.icon-picker-btn.selected { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(232,183,77,0.3); }
+
+.guess-confirm-modal {
+  display: none; position: fixed; inset: 0; background: rgba(10,14,22,0.7);
+  align-items: flex-end; justify-content: center; z-index: 50;
+}
+.guess-confirm-modal.active { display: flex; }
+.guess-confirm-sheet {
+  background: var(--bg-panel); width: 100%; max-width: 520px; border-radius: 24px 24px 0 0;
+  padding: 26px 20px 34px; text-align: center; animation: sheetUp 0.25s ease;
+}
+@keyframes sheetUp { from { transform: translateY(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.score-row { display: grid; grid-template-columns: 1fr auto 50px; gap: 10px; padding: 12px 6px; border-bottom: 1px solid #253048; align-items: center; }
+.score-delta { color: var(--gold-soft); font-weight: 700; }
+.score-total { text-align: right; font-weight: 800; }
+
+/* ---------- Round result screen (poster-style) ---------- */
+.outcome-banner {
+  text-align: center; padding: 22px 16px; border-radius: var(--radius-lg); margin-bottom: 16px;
+  font-size: 22px; font-family: var(--font-display); font-weight: 800;
+}
+.outcome-banner.correct { background: rgba(76,175,125,0.15); border: 1px solid var(--green); color: var(--green); }
+.outcome-banner.wrong { background: rgba(217,99,79,0.15); border: 1px solid var(--red); color: var(--red); }
+.outcome-sub { display: block; font-size: 13px; color: var(--text); font-weight: 400; margin-top: 8px; }
+
+.role-box-row { display: flex; gap: 12px; margin-bottom: 16px; }
+.role-box {
+  flex: 1; background: var(--bg-panel-2); border: 2px solid #313d55; border-radius: var(--radius-md);
+  padding: 14px 10px; text-align: center;
+}
+.role-box.highlight { border-color: var(--gold); background: rgba(232,183,77,0.12); }
+.role-box-label { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.role-box-score { font-size: 20px; font-weight: 800; color: var(--gold-soft); font-family: var(--font-display); }
+
+.others-earned { margin-bottom: 16px; }
+.others-earned-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); margin-bottom: 8px; }
+.others-earned-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.others-chip {
+  background: var(--bg-panel-2); border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 600;
+  display: flex; align-items: center; gap: 6px;
+}
+.others-chip span { color: var(--gold-soft); font-weight: 700; }
+
+.score-totals { border-top: 1px solid #253048; padding-top: 6px; }
+
+.final-winner { text-align: center; font-size: 24px; font-family: var(--font-display); color: var(--gold-soft); margin: 10px 0 24px; }
+.final-row { display: flex; justify-content: space-between; padding: 14px; border-radius: var(--radius-md); margin-bottom: 8px; background: var(--bg-panel-2); font-weight: 600; }
+.final-row.winner { background: linear-gradient(90deg, rgba(232,183,77,0.2), transparent); border: 1px solid var(--gold); }
+
+/* ---------- Player chips / mute ---------- */
+.player-chip { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--text-dim); }
+.player-avatar { font-size: 22px; }
+
+/* ---------- How to play ---------- */
+.step-card { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 16px; }
+.step-num { background: var(--gold); color: #241704; font-weight: 800; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: var(--font-display); }
+.step-text { color: var(--text-dim); font-size: 14px; line-height: 1.5; }
+
+/* ---------- Misc ---------- */
+.top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.top-bar h2 { margin: 0; }
+.small-note { font-size: 12px; color: var(--text-dim); margin-top: 6px; }
+
+@media (min-width: 540px) {
+  .home-title { font-size: 52px; }
+}
+
+/* ---------- Lucide icon sizing (replaces emoji UI icons) ---------- */
+[data-lucide] { width: 20px; height: 20px; stroke-width: 2; vertical-align: middle; flex-shrink: 0; }
+.btn [data-lucide] { width: 22px; height: 22px; }
+.home-footer-links a { display: inline-flex; align-items: center; gap: 6px; }
+.chat-fab [data-lucide] { width: 24px; height: 24px; }
+.lobby-player [data-lucide] { width: 16px; height: 16px; margin-right: 4px; }
+.card-tile-remove [data-lucide] { width: 15px; height: 15px; }
+.step-icon [data-lucide] { width: 16px; height: 16px; }
+
+.home-hero-art {
+  display: flex; justify-content: center; align-items: flex-end; margin-bottom: 4px;
+  position: relative; height: 130px;
+}
+.home-hero-art .hero-icon {
+  width: 84px; height: 118px; border-radius: 8px; overflow: hidden;
+  filter: drop-shadow(0 10px 16px rgba(0,0,0,0.55));
+  transition: transform 0.2s ease;
+}
+.home-hero-art .hero-icon svg { width: 100%; height: 100%; display: block; }
+.home-hero-art #hero-police-icon { transform: rotate(-9deg) translateX(10px); z-index: 1; }
+.home-hero-art #hero-thief-icon { transform: rotate(9deg) translateX(-10px); z-index: 2; }
+.home-hero-decor {
+  position: absolute; opacity: 0.5; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+}
+.home-hero-decor svg { width: 100%; height: 100%; display: block; }
+.home-hero-decor.decor-cuffs { width: 46px; height: 46px; top: -6px; left: 6%; transform: rotate(-16deg); }
+.home-hero-decor.decor-glass { width: 40px; height: 40px; top: 4px; right: 6%; transform: rotate(14deg); }
+
+.final-medal { width: 22px; height: 22px; display: inline-block; vertical-align: middle; margin-right: 4px; }
+.final-medal svg { width: 100%; height: 100%; display: block; }
+.final-rank { font-family: var(--font-display); color: var(--gold-soft); margin-right: 6px; }
+.final-trophy { width: 56px; height: 56px; margin: 0 auto -6px; position: relative; z-index: 2; }
+.final-trophy svg { width: 100%; height: 100%; display: block; }
+.final-medallion {
+  width: 112px; height: 112px; border-radius: 50%; margin: 0 auto; overflow: hidden;
+  border: 5px solid var(--gold); box-shadow: 0 0 0 3px rgba(232,183,77,0.25), 0 8px 20px rgba(0,0,0,0.5);
+  background: radial-gradient(circle at 35% 30%, #3a4770, var(--bg-panel-2));
+}
+.final-medallion svg { width: 100%; height: 100%; display: block; }
+.final-ribbon { text-align: center; margin: -10px auto 18px; position: relative; z-index: 1; }
+.final-ribbon .ribbon-name {
+  display: inline-block; background: linear-gradient(180deg, #c9463a, #8a2a22); color: #fff;
+  font-family: var(--font-display); font-weight: 800; font-size: 18px; letter-spacing: 0.04em;
+  padding: 8px 24px 6px; border-radius: 3px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  position: relative; margin-top: 8px;
+}
+.final-ribbon .ribbon-sub { color: var(--gold-soft); font-size: 12px; font-weight: 700; letter-spacing: 0.05em; margin-top: 6px; }
+
+/* ---------- Confetti burst (correct-guess celebration) ---------- */
+.confetti-layer {
+  position: absolute; inset: 0; pointer-events: none; overflow: visible; z-index: 5;
+}
+.confetti-piece {
+  position: absolute; left: 50%; top: 50%; width: 7px; height: 7px; border-radius: 2px;
+  animation: confettiFly 0.9s cubic-bezier(0.15,0.7,0.4,1) forwards;
+}
+@keyframes confettiFly {
+  0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--cx)), calc(-50% + var(--cy))) rotate(var(--cr)) scale(0.4); opacity: 0; }
+}
+
+/* ---------- Chat (online rooms) ---------- */
+.chat-fab {
+  display: none; position: fixed; right: 18px; bottom: 22px; width: 54px; height: 54px; border-radius: 50%;
+  background: linear-gradient(180deg, var(--gold-soft), var(--gold)); border: none; color: #241704;
+  font-size: 22px; box-shadow: 0 6px 16px rgba(0,0,0,0.4); z-index: 60; cursor: pointer;
+  align-items: center; justify-content: center;
+}
+.chat-fab .chat-dot {
+  position: absolute; top: 4px; right: 4px; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--red); border: 2px solid var(--bg-deep); display: none;
+}
+.chat-fab.has-unread .chat-dot { display: block; }
+
+.chat-panel {
+  display: none; position: fixed; inset: 0; background: rgba(10,14,22,0.7); z-index: 70;
+  align-items: flex-end; justify-content: center;
+}
+.chat-panel.active { display: flex; }
+.chat-panel-inner {
+  background: var(--bg-panel); width: 100%; max-width: 520px; height: 68vh; border-radius: 24px 24px 0 0;
+  display: flex; flex-direction: column; animation: sheetUp 0.25s ease; overflow: hidden;
+}
+.chat-panel-header {
+  display: flex; align-items: center; justify-content: space-between; padding: 16px 18px;
+  border-bottom: 1px solid #253048; font-family: var(--font-display); font-weight: 700; color: var(--gold-soft);
+}
+.chat-close { background: none; border: none; color: var(--text-dim); font-size: 18px; cursor: pointer; }
+.chat-messages { flex: 1; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.chat-msg { max-width: 78%; align-self: flex-start; }
+.chat-msg.mine { align-self: flex-end; text-align: right; }
+.chat-msg-name { font-size: 10px; color: var(--text-dim); margin-bottom: 2px; }
+.chat-msg-bubble {
+  display: inline-block; padding: 9px 13px; border-radius: 14px; background: var(--bg-panel-2);
+  font-size: 13px; line-height: 1.4; word-break: break-word;
+}
+.chat-msg.mine .chat-msg-bubble { background: linear-gradient(180deg, var(--gold-soft), var(--gold)); color: #241704; }
+.chat-input-row { display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid #253048; }
+.chat-input-row input {
+  flex: 1; background: var(--bg-deep); border: 1px solid #2a3450; border-radius: 999px;
+  color: var(--text); padding: 11px 16px; font-size: 14px;
+}
+.chat-send {
+  background: linear-gradient(180deg, var(--gold-soft), var(--gold)); color: #241704; border: none;
+  border-radius: 999px; padding: 0 18px; font-weight: 700; cursor: pointer;
+}
+
+/* ---------- Chat toasts — pop up for everyone in the room ---------- */
+.chat-toast-layer {
+  position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 80;
+  display: flex; flex-direction: column; gap: 8px; width: calc(100% - 32px); max-width: 480px;
+  pointer-events: none; align-items: center;
+}
+.chat-toast {
+  background: var(--bg-panel); border: 1px solid var(--gold); border-radius: 14px;
+  padding: 10px 14px; box-shadow: 0 8px 20px rgba(0,0,0,0.45); max-width: 100%;
+  animation: toastIn 0.25s ease;
+}
+.chat-toast.mine { border-color: #3a466b; }
+.chat-toast.leaving { animation: toastOut 0.3s ease forwards; }
+.chat-toast strong { color: var(--gold-soft); font-size: 12px; display: block; margin-bottom: 2px; }
+.chat-toast span { font-size: 13px; color: var(--text); word-break: break-word; }
+@keyframes toastIn { from { transform: translateY(-14px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes toastOut { to { transform: translateY(-14px); opacity: 0; } }
+
+</style>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+<div id="app">
+
+  <!-- HOME -->
+  <section id="screen-home" class="screen">
+    <div class="home-hero">
+      <div class="home-hero-art">
+        <span class="home-hero-decor decor-cuffs">
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="32" r="13" fill="none" stroke="#c7cbe0" stroke-width="5"/>
+            <circle cx="44" cy="32" r="13" fill="none" stroke="#c7cbe0" stroke-width="5"/>
+            <rect x="28" y="29" width="8" height="6" rx="2" fill="#c7cbe0"/>
+          </svg>
+        </span>
+        <span class="hero-icon" id="hero-police-icon"></span>
+        <span class="hero-icon" id="hero-thief-icon"></span>
+        <span class="home-hero-decor decor-glass">
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="26" cy="26" r="16" fill="none" stroke="#e8b74d" stroke-width="4.5"/>
+            <line x1="37" y1="37" x2="52" y2="52" stroke="#e8b74d" stroke-width="5.5" stroke-linecap="round"/>
+          </svg>
+        </span>
+      </div>
+      <div class="home-title">CHOR POLICE</div>
+      <div class="home-subtitle">Catch the Thief. Outsmart Everyone.</div>
+    </div>
+    <div class="home-buttons">
+      <button id="btn-play-offline" class="btn btn-primary btn-lg"><i data-lucide="gamepad-2"></i> PLAY OFFLINE<br><small>Play against Bots</small></button>
+      <button id="btn-play-online" class="btn btn-secondary btn-lg"><i data-lucide="users"></i> PLAY WITH FRIENDS<br><small>Create / Join Room</small></button>
+    </div>
+    <div class="home-footer-links">
+      <a id="btn-how-to-play"><i data-lucide="book-open"></i> How to Play</a>
+      <a id="btn-settings"><i data-lucide="settings"></i> Settings</a>
+    </div>
+    <div class="panel home-overview">
+      <div class="panel-title">Overview</div>
+      <p class="overview-text">A classic bluffing &amp; deduction game for 4+ players. Every player gets one card. One holds the Police card, one holds the Thief (always worth 0). The Police must guess who's holding the Thief — guess right and the Police scores the reward, guess wrong and the Thief scores it instead.</p>
+    </div>
+  </section>
+
+
+  <!-- ONLINE CHOICE -->
+  <section id="screen-online-choice" class="screen">
+    <div class="top-bar"><h2>Play with Friends</h2></div>
+    <div class="home-buttons">
+      <button id="btn-online-create" class="btn btn-primary btn-lg"><i data-lucide="circle-plus"></i> Create Room</button>
+      <button id="btn-online-join" class="btn btn-secondary btn-lg"><i data-lucide="key-round"></i> Join Room</button>
+      <button class="btn btn-ghost btn-back-home">← Back</button>
+    </div>
+  </section>
+
+  <!-- JOIN ROOM -->
+  <section id="screen-join" class="screen">
+    <div class="top-bar"><h2>Join Room</h2></div>
+    <div class="panel">
+      <div class="panel-title">Room Code</div>
+      <input id="join-room-code" type="text" maxlength="5" placeholder="A7K9D" style="width:100%;padding:14px;font-size:20px;letter-spacing:0.1em;text-align:center;background:var(--bg-deep);border:1px solid #2a3450;border-radius:12px;color:var(--text);text-transform:uppercase;">
+    </div>
+    <div class="panel">
+      <div class="panel-title">Your Name</div>
+      <input id="join-player-name" type="text" placeholder="Enter your name" style="width:100%;padding:14px;font-size:16px;background:var(--bg-deep);border:1px solid #2a3450;border-radius:12px;color:var(--text);">
+    </div>
+    <button id="btn-join-submit" class="btn btn-primary btn-lg">JOIN ROOM</button>
+    <button class="btn btn-ghost btn-back-home" style="margin-top:10px;">← Back</button>
+  </section>
+
+  <!-- SETUP (shared by offline + online-create) -->
+  <section id="screen-setup" class="screen">
+    <div class="top-bar"><h2 id="setup-title">Game Setup</h2></div>
+
+    <div class="panel">
+      <div class="panel-title">Number of Players (Offline only — online fills from lobby)</div>
+      <div class="stepper">
+        <button id="btn-players-minus">−</button>
+        <div class="stepper-value"><span id="players-count">4</span></div>
+        <button id="btn-players-plus">+</button>
+      </div>
+      <div class="small-note">Minimum 4 players</div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Number of Rounds</div>
+      <div class="stepper">
+        <button id="btn-rounds-minus">−</button>
+        <div class="stepper-value"><span id="rounds-count">5</span></div>
+        <button id="btn-rounds-plus">+</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Cards &amp; Values</div>
+      <div id="card-list"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Add New Card</div>
+      <div class="new-card-preview-wrap">
+        <div class="mini-card big-card-face" id="new-card-preview"></div>
+      </div>
+      <div class="add-card-form">
+        <input id="new-card-name" type="text" placeholder="Card name">
+        <input id="new-card-value" type="number" placeholder="Value">
+      </div>
+      <div class="panel-title" style="margin-top:10px;">Card Icon</div>
+      <div id="icon-picker" class="icon-picker"></div>
+      <button id="btn-add-card" class="btn btn-secondary" style="margin-top:10px;"><i data-lucide="plus"></i> ADD NEW CARD</button>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Publicly Revealed Cards</div>
+      <div class="small-note" style="margin-bottom:10px;">The Police card and the round's highest-value card are always shown by default.</div>
+      <div id="reveal-list"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Police Reward Points</div>
+      <input id="police-reward" type="number" value="100" style="width:100%;padding:12px;background:var(--bg-deep);border:1px solid #2a3450;border-radius:10px;color:var(--text);">
+      <div class="small-note">Points transferred between Police and Thief when the round resolves.</div>
+    </div>
+
+    <div id="setup-online-only" class="panel" style="display:none;">
+      <div class="panel-title">Your Name (Host)</div>
+      <input id="host-name-input" type="text" placeholder="Your name" onchange="App.playerName=this.value" style="width:100%;padding:12px;background:var(--bg-deep);border:1px solid #2a3450;border-radius:10px;color:var(--text);">
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Other Settings</div>
+      <div class="toggle-row"><span>3D Animations</span><input id="toggle-3d" type="checkbox" class="switch" checked></div>
+      <div class="toggle-row"><span>Sound Effects</span><input id="toggle-sfx" type="checkbox" class="switch" checked></div>
+      <div class="toggle-row"><span>Background Music</span><input id="toggle-music" type="checkbox" class="switch" checked></div>
+      <div class="toggle-row"><span>Bot Difficulty</span>
+        <select id="bot-difficulty" style="background:var(--bg-deep);color:var(--text);border:1px solid #2a3450;border-radius:8px;padding:6px;">
+          <option value="easy">Easy</option>
+          <option value="normal" selected>Normal</option>
+          <option value="hard">Hard</option>
+        </select>
+      </div>
+    </div>
+
+    <button id="btn-setup-continue" class="btn btn-primary btn-lg">CONTINUE</button>
+    <button class="btn btn-ghost btn-back-home" style="margin-top:10px;">← Back</button>
+  </section>
+
+  <!-- LOBBY (online) -->
+  <section id="screen-lobby" class="screen">
+    <div class="top-bar"><h2>Room Lobby</h2></div>
+    <div class="panel room-code-display">
+      <div class="small-note">ROOM CODE</div>
+      <div class="code" id="lobby-room-code">-----</div>
+      <button id="btn-lobby-copy" class="btn btn-secondary" style="margin-top:10px;width:auto;padding:10px 18px;">Copy Code</button>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Players <span id="lobby-players-count"></span> · Rounds <span id="lobby-rounds"></span></div>
+      <div id="lobby-player-list"></div>
+    </div>
+    <button id="btn-lobby-start" class="btn btn-primary btn-lg">START GAME</button>
+    <div id="lobby-waiting-text" class="small-note" style="text-align:center;margin-top:10px;">Waiting for the host...</div>
+    <button id="btn-lobby-leave" class="btn btn-ghost" style="margin-top:10px;">Leave Room</button>
+  </section>
+
+  <!-- GAME SCREEN -->
+  <section id="screen-game" class="screen">
+    <div class="round-banner" id="round-banner">ROUND 1 / 5</div>
+
+    <div id="stage-board" class="stage active">
+      <div class="board-status" id="board-status">Shuffling the deck…</div>
+      <div class="game-table" id="game-table">
+        <div class="table-center" id="table-center">
+          <div class="shuffle-deck" id="table-deck">
+            <div class="deck-card"></div><div class="deck-card"></div><div class="deck-card"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="stage-scoreboard" class="stage">
+      <div class="panel" id="scoreboard-panel">
+        <div id="scoreboard-body"></div>
+      </div>
+    </div>
+
+    <div id="stage-final" class="stage">
+      <div class="final-trophy" id="final-trophy"></div>
+      <div class="final-medallion" id="final-medallion"></div>
+      <div class="final-ribbon" id="final-ribbon"></div>
+      <div id="final-list"></div>
+      <div class="btn-row" style="margin-top:20px;">
+        <button id="btn-play-again" class="btn btn-primary">PLAY AGAIN</button>
+        <button id="btn-final-home" class="btn btn-secondary">HOME</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- GUESS CONFIRM MODAL (shared) -->
+  <div id="guess-confirm" class="guess-confirm-modal">
+    <div class="guess-confirm-sheet">
+      <h3>Are you sure?</h3>
+      <p class="small-note">Accuse <strong><span id="confirm-suspect-name"></span></strong> of being the Thief?</p>
+      <div class="btn-row" style="margin-top:16px;">
+        <button id="btn-catch-him" class="btn btn-primary">CATCH HIM</button>
+        <button id="btn-cancel-guess" class="btn btn-secondary">CANCEL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW TO PLAY -->
+  <section id="screen-how-to-play" class="screen">
+    <div class="top-bar"><h2>How to Play</h2></div>
+    <div class="step-card"><div class="step-num">1</div><div class="step-text">Everyone receives one hidden card.</div></div>
+    <div class="step-card"><div class="step-num">2</div><div class="step-text">Whoever holds the Police card becomes the Police for the round — this is a separate card from the highest-value one, and could belong to anyone.</div></div>
+    <div class="step-card"><div class="step-num">3</div><div class="step-text">The Police card and that round's highest-value card are both revealed to everyone by default. The Thief card is always worth 0 — and stays hidden until the guess.</div></div>
+    <div class="step-card"><div class="step-num">4</div><div class="step-text">The Police studies the other players.</div></div>
+    <div class="step-card"><div class="step-num">5</div><div class="step-text">Police chooses a suspect and confirms the accusation.</div></div>
+    <div class="step-card"><div class="step-num">6</div><div class="step-text">Correct → Police gets the reward. Wrong → the Thief gets it instead.</div></div>
+    <div class="step-card"><div class="step-num">7</div><div class="step-text">After all rounds, the highest total score wins.</div></div>
+    <button class="btn btn-secondary btn-back-home" style="margin-top:10px;">← Back</button>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="screen-settings" class="screen">
+    <div class="top-bar"><h2>Settings</h2></div>
+    <div class="panel">
+      <div class="toggle-row"><span>Sound Effects</span><input id="toggle-sfx-settings" type="checkbox" class="switch" checked></div>
+      <div class="toggle-row"><span>SFX Volume</span><input id="sfx-volume" type="range" min="0" max="1" step="0.05" value="0.7"></div>
+      <div class="toggle-row"><span>Background Music</span><input id="toggle-music-settings" type="checkbox" class="switch" checked></div>
+      <div class="toggle-row"><span>Music Volume</span><input id="music-volume" type="range" min="0" max="1" step="0.05" value="0.25"></div>
+      <div class="toggle-row"><span>3D Animations</span><input id="toggle-3d-settings" type="checkbox" class="switch" checked></div>
+      <div class="toggle-row"><span>Haptic Feedback</span><input id="toggle-haptics" type="checkbox" class="switch" checked></div>
+    </div>
+    <div class="btn-row">
+      <button id="btn-settings-rules" class="btn btn-secondary"><i data-lucide="scroll-text"></i> Rules</button>
+      <button id="btn-settings-about" class="btn btn-secondary"><i data-lucide="info"></i> About</button>
+    </div>
+    <button class="btn btn-secondary btn-back-home" style="margin-top:10px;">← Back</button>
+  </section>
+
+  <!-- CHAT (online rooms only) -->
+  <div id="chat-toast-layer" class="chat-toast-layer"></div>
+  <button id="btn-chat-toggle" class="chat-fab"><i data-lucide="message-circle"></i><span class="chat-dot"></span></button>
+  <div id="chat-panel" class="chat-panel">
+    <div class="chat-panel-inner">
+      <div class="chat-panel-header">
+        <span>Room Chat</span>
+        <button id="btn-chat-close" class="chat-close"><i data-lucide="x"></i></button>
+      </div>
+      <div id="chat-messages" class="chat-messages"></div>
+      <div class="chat-input-row">
+        <input id="chat-input" type="text" placeholder="Message your friends…" maxlength="300">
+        <button id="btn-chat-send" class="chat-send">Send</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// CARD-ART.JS — Full illustrated card scenes (not icons).
+// Every card is a self-contained framed illustration: gradient
+// spotlight background, ornate double-border, and a layered
+// character/scene composition filling the frame. All original
+// hand-drawn vector geometry — nothing traced or copied.
+// ============================================================
+
+function frameShell(bgGradientId, stops, strokeColor) {
+  return `
+    <defs>
+      <radialGradient id="${bgGradientId}" cx="50%" cy="32%" r="78%">
+        ${stops}
+      </radialGradient>
+    </defs>
+    <rect width="100" height="140" fill="url(#${bgGradientId})"/>
+    <rect x="3" y="3" width="94" height="134" rx="7" fill="none" stroke="${strokeColor}" stroke-width="2.5"/>
+    <rect x="7.5" y="7.5" width="85" height="125" rx="4" fill="none" stroke="${strokeColor}" stroke-width="1" opacity="0.55"/>
+  `;
+}
+
+const CP_ICONS = {
+  police: `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+    ${frameShell('gPolice', '<stop offset="0%" stop-color="#3d658f"/><stop offset="100%" stop-color="#141f34"/>', '#e8b74d')}
+    <circle cx="50" cy="58" r="30" fill="#f2cf7e" opacity="0.10"/>
+    <path d="M18 122 Q50 96 82 122 L82 133 L18 133 Z" fill="#182338"/>
+    <path d="M18 122 Q50 96 82 122" fill="none" stroke="#3d658f" stroke-width="2"/>
+    <circle cx="50" cy="78" r="18" fill="#e8b98a"/>
+    <path d="M29 65 Q50 40 71 65 L71 71 Q50 62 29 71 Z" fill="#182338" stroke="#e8b74d" stroke-width="1.5"/>
+    <ellipse cx="50" cy="65" rx="22" ry="5.5" fill="#233a5c" stroke="#e8b74d" stroke-width="1.5"/>
+    <circle cx="50" cy="65" r="4" fill="#e8b74d"/>
+    <path d="M50 100 L54.5 108.5 L64 109.5 L57 116 L59 125.5 L50 120 L41 125.5 L43 116 L36 109.5 L45.5 108.5 Z" fill="#e8b74d"/>
+    <circle cx="78" cy="96" r="9.5" fill="none" stroke="#c7cbe0" stroke-width="3"/>
+    <line x1="84.5" y1="102.5" x2="93" y2="111" stroke="#c7cbe0" stroke-width="3.5" stroke-linecap="round"/>
+  </svg>`,
+
+  thief: `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+    ${frameShell('gThief', '<stop offset="0%" stop-color="#5e2c28"/><stop offset="100%" stop-color="#190c0a"/>', '#c96b4a')}
+    <path d="M16 123 Q50 98 84 123 L84 133 L16 133 Z" fill="#241010"/>
+    <path d="M28 60 Q50 41 72 60 L72 94 Q50 108 28 94 Z" fill="#150a0a"/>
+    <path d="M19 66 Q50 47 81 66 L81 72 Q50 58 19 72 Z" fill="#0c0505"/>
+    <ellipse cx="40" cy="79" rx="7" ry="4.8" fill="#f2ede2"/>
+    <ellipse cx="60" cy="79" rx="7" ry="4.8" fill="#f2ede2"/>
+    <ellipse cx="40" cy="79" rx="2.8" ry="2.8" fill="#150a0a"/>
+    <ellipse cx="60" cy="79" rx="2.8" ry="2.8" fill="#150a0a"/>
+    <path d="M45 39 L55 39 L59 50 L41 50 Z" fill="#0c0505"/>
+    <path d="M30 92 Q50 100 70 92" stroke="#0c0505" stroke-width="2" fill="none" opacity="0.6"/>
+  </svg>`,
+
+  king: `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+    ${frameShell('gKing', '<stop offset="0%" stop-color="#6e521e"/><stop offset="100%" stop-color="#211a08"/>', '#e8b74d')}
+    <path d="M14 123 Q50 91 86 123 L86 133 L14 133 Z" fill="#4a2f0a"/>
+    <path d="M14 123 Q50 91 86 123" fill="none" stroke="#e8b74d" stroke-width="2"/>
+    <circle cx="50" cy="82" r="19" fill="#e8b98a"/>
+    <path d="M26 66 L33 44 L44 59 L50 40 L56 59 L67 44 L74 66 Z" fill="#e8b74d" stroke="#7a4f12" stroke-width="1.5"/>
+    <circle cx="33" cy="44" r="3.6" fill="#f2cf7e" stroke="#7a4f12" stroke-width="1.2"/>
+    <circle cx="50" cy="40" r="4" fill="#f2cf7e" stroke="#7a4f12" stroke-width="1.2"/>
+    <circle cx="67" cy="44" r="3.6" fill="#f2cf7e" stroke="#7a4f12" stroke-width="1.2"/>
+    <circle cx="50" cy="68" r="3.2" fill="#6a2a26"/>
+    <path d="M36 96 Q50 102 64 96" stroke="#4a2f0a" stroke-width="2" fill="none" opacity="0.6"/>
+  </svg>`,
+
+  minister: `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+    ${frameShell('gMinister', '<stop offset="0%" stop-color="#42527e"/><stop offset="100%" stop-color="#141a2c"/>', '#8fa5d6')}
+    <path d="M16 124 Q50 100 84 124 L84 133 L16 133 Z" fill="#202942"/>
+    <rect x="45" y="107" width="10" height="18" fill="#f2ede2"/>
+    <circle cx="50" cy="83" r="18" fill="#e8b98a"/>
+    <rect x="31" y="52" width="38" height="26" rx="3" fill="#333f66"/>
+    <rect x="31" y="47" width="38" height="8" rx="2" fill="#232c49"/>
+    <path d="M38 98 Q50 105 62 98" stroke="#f2ede2" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+  </svg>`,
+
+  warrior: `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+    ${frameShell('gWarrior', '<stop offset="0%" stop-color="#4c5772"/><stop offset="100%" stop-color="#14171f"/>', '#c7cbe0')}
+    <path d="M32 118 L64 84 L70 130 L36 130 Z" fill="#333f66" stroke="#c7cbe0" stroke-width="1.5" opacity="0.9"/>
+    <path d="M20 92 L64 52" stroke="#c7cbe0" stroke-width="7" stroke-linecap="round"/>
+    <path d="M80 92 L36 52" stroke="#c7cbe0" stroke-width="7" stroke-linecap="round"/>
+    <path d="M15 87 L24 87 L24 96" stroke="#7a4f12" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M85 87 L76 87 L76 96" stroke="#7a4f12" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <circle cx="50" cy="72" r="8" fill="#e8b74d" stroke="#7a4f12" stroke-width="1.5"/>
+  </svg>`,
+
+  merchant: `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+    ${frameShell('gMerchant', '<stop offset="0%" stop-color="#7e5c1e"/><stop offset="100%" stop-color="#211a08"/>', '#e8b74d')}
+    <path d="M34 55 Q50 32 66 55 L79 82 Q88 112 50 124 Q12 112 21 82 Z" fill="#c99a3a" stroke="#7a4f12" stroke-width="1.5"/>
+    <path d="M39 49 L61 49" stroke="#7a4f12" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="50" cy="92" r="13" fill="#7a4f12" opacity="0.28"/>
+    <path d="M50 79 V105 M43 84 Q50 81 57 84 M43 100 Q50 103 57 100" stroke="#4a2f0a" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="26" cy="120" r="6.5" fill="#f2cf7e" stroke="#7a4f12" stroke-width="1.2"/>
+    <circle cx="74" cy="122" r="5.5" fill="#f2cf7e" stroke="#7a4f12" stroke-width="1.2"/>
+  </svg>`,
+
+  joker: `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+    ${frameShell('gJoker', '<stop offset="0%" stop-color="#6e3a7e"/><stop offset="100%" stop-color="#1b0e20"/>', '#e8b74d')}
+    <path d="M18 119 Q50 96 82 119 L82 133 L18 133 Z" fill="#4a2258"/>
+    <circle cx="50" cy="88" r="18" fill="#e8b98a"/>
+    <path d="M20 61 Q20 26 40 42 Q47 12 56 42 Q65 12 72 42 Q82 26 82 61 Q51 48 20 61 Z" fill="#7a3a8a" stroke="#4a2258" stroke-width="1.5"/>
+    <circle cx="38" cy="38" r="4.4" fill="#e8b74d"/>
+    <circle cx="55" cy="34" r="4.4" fill="#e8b74d"/>
+    <circle cx="70" cy="39" r="4.4" fill="#e8b74d"/>
+    <path d="M40 93 Q50 99 60 93" stroke="#4a2258" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  </svg>`,
+
+  shield: `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+    ${frameShell('gShield', '<stop offset="0%" stop-color="#3f5488"/><stop offset="100%" stop-color="#141a2c"/>', '#8fa5d6')}
+    <path d="M50 34 L76 46 V76 C76 98 64 112 50 120 C36 112 24 98 24 76 V46 Z" fill="#3f5488" stroke="#bcd0f2" stroke-width="2.5"/>
+  </svg>`,
+
+  star: `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+    ${frameShell('gStar', '<stop offset="0%" stop-color="#7e5c1e"/><stop offset="100%" stop-color="#211a08"/>', '#e8b74d')}
+    <path d="M50 40 L59 65 L86 66 L64 82 L72 108 L50 92 L28 108 L36 82 L14 66 L41 65 Z" fill="#e8b74d" stroke="#7a4f12" stroke-width="1.5"/>
+  </svg>`,
+
+  gem: `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+    ${frameShell('gGem', '<stop offset="0%" stop-color="#3a6ea0"/><stop offset="100%" stop-color="#101828"/>', '#bcd8f7')}
+    <path d="M28 58 L50 32 L72 58 L50 112 Z" fill="#4a90d9" stroke="#bcd8f7" stroke-width="2"/>
+    <path d="M28 58 H72 M38 58 L50 112 M62 58 L50 112" stroke="#bcd8f7" stroke-width="1.2"/>
+  </svg>`,
+
+  scroll: `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+    ${frameShell('gScroll', '<stop offset="0%" stop-color="#7a6a3e"/><stop offset="100%" stop-color="#201c10"/>', '#d9c9a0')}
+    <rect x="26" y="42" width="48" height="56" rx="4" fill="#d9c9a0"/>
+    <rect x="26" y="42" width="48" height="10" rx="3" fill="#c2ac7a"/>
+    <rect x="26" y="88" width="48" height="10" rx="3" fill="#c2ac7a"/>
+    <line x1="34" y1="62" x2="66" y2="62" stroke="#7a6a4a" stroke-width="2.4"/>
+    <line x1="34" y1="72" x2="66" y2="72" stroke="#7a6a4a" stroke-width="2.4"/>
+  </svg>`,
+
+  moon: `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+    ${frameShell('gMoon', '<stop offset="0%" stop-color="#3f4a6e"/><stop offset="100%" stop-color="#12141f"/>', '#c7cbe0')}
+    <path d="M64 32 A34 34 0 1 0 64 108 A27 27 0 1 1 64 32 Z" fill="#c7cbe0"/>
+  </svg>`,
+
+  trophy: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 10 H44 V26 C44 35 38 41 32 41 C26 41 20 35 20 26 Z" fill="#e8b74d" stroke="#7a4f12" stroke-width="2"/>
+    <path d="M20 14 C12 14 10 22 16 27 C18.5 29 20.5 29 20.5 29" stroke="#e8b74d" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M44 14 C52 14 54 22 48 27 C45.5 29 43.5 29 43.5 29" stroke="#e8b74d" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <rect x="28" y="41" width="8" height="9" fill="#e8b74d"/>
+    <rect x="19" y="50" width="26" height="6" rx="2" fill="#e8b74d" stroke="#7a4f12" stroke-width="2"/>
+  </svg>`,
+};
+
+const CP_CUSTOM_ICON_KEYS = ['king', 'minister', 'warrior', 'merchant', 'joker', 'shield', 'star', 'gem', 'scroll', 'moon'];
+
+function cardIconSvg(key) {
+  return CP_ICONS[key] || CP_ICONS.star;
+}
+
+if (typeof window !== 'undefined') {
+  window.CP_CardArt = { cardIconSvg, CUSTOM_ICON_KEYS: CP_CUSTOM_ICON_KEYS };
+}
+
+</script>
+<script>
+// ============================================================
+// AVATAR-ART.JS — Cartoon character portraits (boy/girl variants)
+// A small hand-drawn set so every player looks like a distinct
+// character, not a repeated generic silhouette.
+// ============================================================
+
+const CP_AVATARS = [
+  // 1. Boy — brown short hair, red shirt
+  `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="48" fill="#f4d9a8"/>
+    <path d="M6 88 Q50 62 94 88 L94 100 L6 100 Z" fill="#d9483f"/>
+    <circle cx="50" cy="44" r="24" fill="#f1c48a"/>
+    <path d="M24 38 Q26 14 50 14 Q74 14 76 38 Q68 26 50 26 Q32 26 24 38 Z" fill="#5a3820"/>
+    <circle cx="41" cy="46" r="3" fill="#2a1c10"/>
+    <circle cx="59" cy="46" r="3" fill="#2a1c10"/>
+    <path d="M42 56 Q50 61 58 56" stroke="#8a5a2a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  </svg>`,
+
+  // 2. Girl — black ponytail, teal shirt
+  `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="48" fill="#f4d9a8"/>
+    <path d="M6 88 Q50 62 94 88 L94 100 L6 100 Z" fill="#2f8f8a"/>
+    <path d="M74 40 Q84 50 78 66 L70 60 Z" fill="#221a14"/>
+    <circle cx="50" cy="44" r="24" fill="#f1c48a"/>
+    <path d="M22 40 Q24 12 50 12 Q76 12 78 40 Q78 30 66 27 Q60 20 50 20 Q40 20 34 27 Q22 30 22 40 Z" fill="#221a14"/>
+    <circle cx="41" cy="46" r="3" fill="#2a1c10"/>
+    <circle cx="59" cy="46" r="3" fill="#2a1c10"/>
+    <path d="M43 57 Q50 61 57 57" stroke="#a5432e" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  </svg>`,
+
+  // 3. Boy — spiky black hair, navy shirt
+  `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="48" fill="#e8b98a"/>
+    <path d="M6 88 Q50 62 94 88 L94 100 L6 100 Z" fill="#2c3d68"/>
+    <circle cx="50" cy="44" r="24" fill="#e8b98a"/>
+    <path d="M26 36 L32 18 L40 32 L48 14 L54 32 L62 16 L70 34 Q72 24 50 22 Q28 24 26 36 Z" fill="#181818"/>
+    <circle cx="41" cy="47" r="3" fill="#20140c"/>
+    <circle cx="59" cy="47" r="3" fill="#20140c"/>
+    <path d="M42 57 Q50 62 58 57" stroke="#8a4a2a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  </svg>`,
+
+  // 4. Girl — brown bob, mustard shirt
+  `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="48" fill="#f4d9a8"/>
+    <path d="M6 88 Q50 62 94 88 L94 100 L6 100 Z" fill="#c99a3a"/>
+    <path d="M20 44 Q18 20 50 16 Q82 20 80 44 Q80 58 74 64 L72 46 Q72 30 50 28 Q28 30 28 46 L26 64 Q20 58 20 44 Z" fill="#6a3f1f"/>
+    <circle cx="50" cy="46" r="22" fill="#f1c48a"/>
+    <circle cx="41" cy="48" r="2.8" fill="#2a1c10"/>
+    <circle cx="59" cy="48" r="2.8" fill="#2a1c10"/>
+    <path d="M43 58 Q50 62 57 58" stroke="#a5432e" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  </svg>`,
+
+  // 5. Boy — buzzcut, forest-green shirt
+  `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="48" fill="#e0a878"/>
+    <path d="M6 88 Q50 62 94 88 L94 100 L6 100 Z" fill="#3a7a4a"/>
+    <circle cx="50" cy="44" r="24" fill="#e0a878"/>
+    <path d="M25 40 Q25 16 50 16 Q75 16 75 40 Q75 30 50 28 Q25 30 25 40 Z" fill="#3a2414"/>
+    <circle cx="41" cy="47" r="3" fill="#20140c"/>
+    <circle cx="59" cy="47" r="3" fill="#20140c"/>
+    <path d="M42 57 Q50 60 58 57" stroke="#7a4522" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  </svg>`,
+
+  // 6. Girl — twin buns, plum shirt
+  `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="48" fill="#e0a878"/>
+    <path d="M6 88 Q50 62 94 88 L94 100 L6 100 Z" fill="#7a3a6a"/>
+    <circle cx="22" cy="30" r="9" fill="#241610"/>
+    <circle cx="78" cy="30" r="9" fill="#241610"/>
+    <path d="M24 42 Q22 16 50 14 Q78 16 76 42 Q76 28 50 26 Q24 28 24 42 Z" fill="#241610"/>
+    <circle cx="50" cy="46" r="22" fill="#e0a878"/>
+    <circle cx="41" cy="48" r="2.8" fill="#20140c"/>
+    <circle cx="59" cy="48" r="2.8" fill="#20140c"/>
+    <path d="M43 58 Q50 62 57 58" stroke="#8a4530" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  </svg>`,
+
+  // 7. Boy — curly hair, burnt orange shirt
+  `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="48" fill="#f4d9a8"/>
+    <path d="M6 88 Q50 62 94 88 L94 100 L6 100 Z" fill="#b85a2a"/>
+    <circle cx="50" cy="44" r="24" fill="#f1c48a"/>
+    <circle cx="27" cy="30" r="8" fill="#4a2a14"/>
+    <circle cx="40" cy="20" r="9" fill="#4a2a14"/>
+    <circle cx="58" cy="18" r="9" fill="#4a2a14"/>
+    <circle cx="72" cy="28" r="8" fill="#4a2a14"/>
+    <circle cx="41" cy="46" r="3" fill="#2a1c10"/>
+    <circle cx="59" cy="46" r="3" fill="#2a1c10"/>
+    <path d="M42 56 Q50 60 58 56" stroke="#8a5a2a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  </svg>`,
+
+  // 8. Girl — long straight red hair, sky-blue shirt
+  `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="48" fill="#f4d9a8"/>
+    <path d="M6 88 Q50 62 94 88 L94 100 L6 100 Z" fill="#3f8fc9"/>
+    <path d="M18 46 Q14 20 50 14 Q86 20 82 46 L76 70 L72 46 Q72 28 50 26 Q28 28 28 46 L24 70 Z" fill="#9a3f28"/>
+    <circle cx="50" cy="46" r="22" fill="#f1c48a"/>
+    <circle cx="41" cy="48" r="2.8" fill="#2a1c10"/>
+    <circle cx="59" cy="48" r="2.8" fill="#2a1c10"/>
+    <path d="M43 58 Q50 62 57 58" stroke="#a5432e" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  </svg>`,
+];
+
+// Deterministic pick so the same seed (player id / index) always renders
+// the same character within one game.
+function avatarSvg(seed) {
+  let idx;
+  if (typeof seed === 'number') {
+    idx = seed;
+  } else {
+    const s = String(seed || '');
+    let hash = 0;
+    for (let i = 0; i < s.length; i++) hash = (hash * 31 + s.charCodeAt(i)) >>> 0;
+    idx = hash;
+  }
+  return CP_AVATARS[idx % CP_AVATARS.length];
+}
+
+if (typeof window !== 'undefined') {
+  window.CP_AvatarArt = { avatarSvg, COUNT: CP_AVATARS.length };
+}
+
+</script>
+<script>
+// ============================================================
+// CARDS.JS — Card model, default deck, deck-building helpers
+// ============================================================
+// A card is: { id, name, value, icon, type, revealed }
+//   type: "police" | "thief" | "normal"
+//   value: number for normal/thief, "Special" (string) for police (display only)
+//   revealed: whether this card is publicly shown once dealt (host-configurable
+//             for normal cards; police is ALWAYS revealed once identified;
+//             thief is NEVER revealed until the round resolves)
+
+function makeId(prefix) {
+  return `${prefix}_${Math.random().toString(36).slice(2, 9)}`;
+}
+
+function defaultCardSet() {
+  return [
+    { id: makeId('card'), name: 'Police', value: 'Special', icon: 'police', type: 'police', revealed: true, locked: true },
+    { id: makeId('card'), name: 'Thief', value: 0, icon: 'thief', type: 'thief', revealed: false, locked: true },
+    { id: makeId('card'), name: 'King', value: 90, icon: 'king', type: 'normal', revealed: false },
+    { id: makeId('card'), name: 'Minister', value: 70, icon: 'minister', type: 'normal', revealed: false },
+    { id: makeId('card'), name: 'Warrior', value: 50, icon: 'warrior', type: 'normal', revealed: false },
+    { id: makeId('card'), name: 'Merchant', value: 30, icon: 'merchant', type: 'normal', revealed: false },
+    { id: makeId('card'), name: 'Joker', value: 10, icon: 'joker', type: 'normal', revealed: false },
+  ];
+}
+
+// Ensures a deck has exactly `playerCount` cards by cycling extra copies of
+// the lowest-priority normal cards if the host hasn't defined enough unique
+// ones. Police + Thief are always singletons.
+function buildDeckForPlayerCount(cardDefs, playerCount) {
+  const police = cardDefs.find(c => c.type === 'police');
+  const thief = cardDefs.find(c => c.type === 'thief');
+  const normals = cardDefs.filter(c => c.type === 'normal');
+
+  if (!police || !thief) throw new Error('Deck must contain exactly one Police and one Thief card.');
+  if (normals.length === 0) throw new Error('Add at least one normal card besides Police and Thief.');
+
+  const deck = [police, thief];
+  let i = 0;
+  while (deck.length < playerCount) {
+    const base = normals[i % normals.length];
+    // clone so duplicate copies get unique ids/instance info but same identity/value
+    deck.push({ ...base, id: makeId('card'), sourceId: base.id });
+    i++;
+  }
+  return deck.slice(0, playerCount);
+}
+
+function shuffle(array) {
+  const a = array.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Deals shuffled deck to players, returns { playerId: card }
+function dealCards(players, deck) {
+  const shuffled = shuffle(deck);
+  const assignment = {};
+  players.forEach((p, idx) => { assignment[p.id] = shuffled[idx]; });
+  return assignment;
+}
+
+if (typeof window !== 'undefined') {
+  window.CP_Cards = { makeId, defaultCardSet, buildDeckForPlayerCount, shuffle, dealCards };
+}
+
+</script>
+<script>
+// ============================================================
+// SOUND.JS — Lightweight synthesized SFX (Web Audio API)
+// No external files needed, so nothing to go missing on deploy.
+// A background "music" bed is a soft synthesized pad loop.
+// ============================================================
+
+class SoundEngine {
+  constructor() {
+    this.ctx = null;
+    this.sfxOn = true;
+    this.musicOn = true;
+    this.sfxVolume = 0.7;
+    this.musicVolume = 0.25;
+    this.musicNodes = null;
+  }
+
+  _ensureCtx() {
+    if (!this.ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AC();
+    }
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+    return this.ctx;
+  }
+
+  _tone(freq, duration, type = 'sine', gainMul = 1, delay = 0) {
+    if (!this.sfxOn) return;
+    const ctx = this._ensureCtx();
+    const t0 = ctx.currentTime + delay;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, t0);
+    gain.gain.setValueAtTime(0, t0);
+    gain.gain.linearRampToValueAtTime(this.sfxVolume * gainMul, t0 + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, t0 + duration);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0 + duration + 0.02);
+  }
+
+  _noiseBurst(duration, gainMul = 1, delay = 0) {
+    if (!this.sfxOn) return;
+    const ctx = this._ensureCtx();
+    const t0 = ctx.currentTime + delay;
+    const bufferSize = ctx.sampleRate * duration;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+    const src = ctx.createBufferSource();
+    src.buffer = buffer;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(this.sfxVolume * gainMul, t0);
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'highpass';
+    filter.frequency.value = 800;
+    src.connect(filter).connect(gain).connect(ctx.destination);
+    src.start(t0);
+  }
+
+  cardShuffle() {
+    for (let i = 0; i < 6; i++) this._noiseBurst(0.06, 0.5, i * 0.07);
+  }
+  cardDeal() { this._noiseBurst(0.08, 0.6); }
+  cardFlip() { this._tone(600, 0.08, 'triangle', 0.5); this._noiseBurst(0.04, 0.3, 0.02); }
+  cardSlide() { this._noiseBurst(0.1, 0.35); }
+  buttonClick() { this._tone(440, 0.06, 'square', 0.3); }
+  playerJoin() { this._tone(523, 0.1, 'sine', 0.5); this._tone(659, 0.12, 'sine', 0.5, 0.08); }
+  playerLeave() { this._tone(392, 0.12, 'sine', 0.4); this._tone(261, 0.15, 'sine', 0.4, 0.08); }
+  policeIdentified() { this._tone(220, 0.15, 'sawtooth', 0.4); this._tone(440, 0.25, 'sawtooth', 0.5, 0.1); }
+  selecting() { this._tone(800, 0.04, 'square', 0.2); }
+  correctGuess() {
+    [523, 659, 784, 1047].forEach((f, i) => this._tone(f, 0.2, 'triangle', 0.6, i * 0.09));
+  }
+  wrongGuess() {
+    this._tone(200, 0.3, 'sawtooth', 0.5);
+    this._tone(150, 0.35, 'sawtooth', 0.4, 0.1);
+  }
+  scoreUp() { this._tone(700, 0.08, 'sine', 0.4); this._tone(950, 0.1, 'sine', 0.4, 0.06); }
+  roundComplete() { [440, 550, 660].forEach((f, i) => this._tone(f, 0.15, 'sine', 0.4, i * 0.1)); }
+  victory() {
+    [523, 659, 784, 1047, 1319].forEach((f, i) => this._tone(f, 0.3, 'triangle', 0.6, i * 0.12));
+  }
+
+  startMusic() {
+    if (!this.musicOn || this.musicNodes) return;
+    const ctx = this._ensureCtx();
+    const master = ctx.createGain();
+    master.gain.value = this.musicVolume;
+    master.connect(ctx.destination);
+    const notes = [261.6, 329.6, 392.0, 523.3];
+    const oscs = notes.map((f, i) => {
+      const o = ctx.createOscillator();
+      o.type = 'sine';
+      o.frequency.value = f / 2;
+      const g = ctx.createGain();
+      g.gain.value = 0.15;
+      o.connect(g).connect(master);
+      o.start();
+      return o;
+    });
+    this.musicNodes = { master, oscs };
+  }
+  stopMusic() {
+    if (!this.musicNodes) return;
+    this.musicNodes.oscs.forEach(o => { try { o.stop(); } catch (e) {} });
+    this.musicNodes = null;
+  }
+  setMusicOn(on) { this.musicOn = on; if (on) this.startMusic(); else this.stopMusic(); }
+  setSfxOn(on) { this.sfxOn = on; }
+  setSfxVolume(v) { this.sfxVolume = v; }
+  setMusicVolume(v) { this.musicVolume = v; if (this.musicNodes) this.musicNodes.master.gain.value = v; }
+}
+
+if (typeof window !== 'undefined') {
+  window.CP_Sound = new SoundEngine();
+}
+
+</script>
+<script>
+// ============================================================
+// BOTS.JS — Bot AI for offline mode
+// Bots only ever see information they're entitled to (their own
+// card, and whatever has been publicly revealed). They never
+// read hidden state directly off the game object for their guess.
+// ============================================================
+
+const BOT_NAME_POOL = ['Rahim', 'Karim', 'Rafi', 'Sami', 'Arif', 'Nabil', 'Tanvir', 'Farhan'];
+
+function pickBotNames(count) {
+  const shuffled = CP_Cards.shuffle(BOT_NAME_POOL);
+  return shuffled.slice(0, count);
+}
+
+// difficulty: 'easy' | 'normal' | 'hard'
+// Returns a suspectId chosen from `suspects` (array of player ids, excludes police).
+// `publicInfo` = { revealedCardsByPlayer: {playerId: card|null} } — only what's public.
+function botChooseSuspect(botPlayerId, suspects, publicInfo, difficulty = 'normal') {
+  // Base: uniform suspicion across all suspects
+  const weights = {};
+  suspects.forEach(id => { weights[id] = 1; });
+
+  // If a suspect's card has been publicly revealed and it's not the thief
+  // value, a rational bot should downweight them heavily (they're cleared).
+  suspects.forEach(id => {
+    const revealed = publicInfo.revealedCardsByPlayer[id];
+    if (revealed && revealed.type !== 'thief') {
+      weights[id] *= 0.05; // nearly ruled out, but not impossible (info could be stale/edge case)
+    }
+  });
+
+  // Difficulty affects how "sharp" the bot's reasoning is — hard bots lean
+  // harder into the deduced weights; easy bots are closer to random.
+  const sharpness = { easy: 0.3, normal: 0.7, hard: 1.0 }[difficulty] ?? 0.7;
+  const blended = {};
+  suspects.forEach(id => {
+    blended[id] = (1 - sharpness) * 1 + sharpness * weights[id];
+  });
+
+  return weightedRandomPick(blended);
+}
+
+function weightedRandomPick(weightMap) {
+  const entries = Object.entries(weightMap);
+  const total = entries.reduce((s, [, w]) => s + w, 0);
+  let r = Math.random() * total;
+  for (const [id, w] of entries) {
+    r -= w;
+    if (r <= 0) return id;
+  }
+  return entries[entries.length - 1][0];
+}
+
+if (typeof window !== 'undefined') {
+  window.CP_Bots = { pickBotNames, botChooseSuspect };
+}
+
+</script>
+<script>
+// ============================================================
+// GAME.JS — Core state machine & round logic
+// Shared by offline (local) and online (Firebase-synced) modes.
+// This file has NO Firebase/DOM dependency — pure game logic —
+// so it's easy to reason about and reuse for validation on the
+// "host" client in online mode.
+// ============================================================
+
+const STATES = [
+  'HOME', 'MODE_SELECT', 'SETUP', 'LOBBY', 'ROUND_START', 'SHUFFLING',
+  'DEALING', 'PUBLIC_REVEAL', 'POLICE_IDENTIFIED', 'POLICE_GUESS',
+  'RESULT', 'SCORE_UPDATE', 'ROUND_END', 'FINAL_RESULT'
+];
+
+class ChorPoliceGame {
+  /**
+   * @param {object} config
+   *  players: [{id,name,avatar,isHost,isBot,botDifficulty}]
+   *  cardDefs: card definitions (see cards.js)
+   *  numRounds: number
+   *  policeRewardPoints: number — points transferred on correct/incorrect guess
+   */
+  constructor(config) {
+    this.players = config.players.map(p => ({ ...p, score: 0, roundScore: 0, isConnected: true }));
+    this.cardDefs = config.cardDefs;
+    this.numRounds = config.numRounds;
+    this.policeRewardPoints = config.policeRewardPoints ?? 100;
+    this.round = 0;
+    this.state = 'ROUND_START';
+    this.assignment = {}; // playerId -> card
+    this.policeId = null;
+    this.thiefId = null;
+    this.guessedSuspectId = null;
+    this.roundHistory = [];
+    this.listeners = [];
+  }
+
+  onChange(fn) { this.listeners.push(fn); }
+  _emit() { this.listeners.forEach(fn => fn(this)); }
+
+  startRound() {
+    this.round += 1;
+    this.state = 'SHUFFLING';
+    const deck = CP_Cards.buildDeckForPlayerCount(this.cardDefs, this.players.length);
+    this.assignment = CP_Cards.dealCards(this.players, deck);
+    this.policeId = this.players.find(p => this.assignment[p.id].type === 'police').id;
+    this.thiefId = this.players.find(p => this.assignment[p.id].type === 'thief').id;
+    this.guessedSuspectId = null;
+    this.players.forEach(p => { p.roundScore = 0; });
+    this._emit();
+  }
+
+  advanceToDealing() { this.state = 'DEALING'; this._emit(); }
+
+  advanceToPublicReveal() {
+    this.state = 'PUBLIC_REVEAL';
+    this._emit();
+  }
+
+  // What's visible to everyone right now, given reveal rules. The Police
+  // card and the round's highest-value card are two SEPARATE things — the
+  // Police holder is whoever holds the Police card, not whoever has the
+  // biggest number. Both are revealed by default; the host can reveal more.
+  publicRevealState() {
+    let highestValue = -Infinity;
+    this.players.forEach(p => {
+      const c = this.assignment[p.id];
+      if (typeof c.value === 'number' && c.value > highestValue) highestValue = c.value;
+    });
+
+    const revealedCardsByPlayer = {};
+    let highestId = null;
+    this.players.forEach(p => {
+      const card = this.assignment[p.id];
+      const isPolice = card.type === 'police';
+      const isHighest = typeof card.value === 'number' && card.value === highestValue && highestValue > 0;
+      if (isHighest) highestId = p.id;
+      const isPubliclyRevealed = isPolice || isHighest || (card.type === 'normal' && card.revealed);
+      revealedCardsByPlayer[p.id] = isPubliclyRevealed ? card : null;
+    });
+    return { revealedCardsByPlayer, policeId: this.policeId, highestId };
+  }
+
+  advanceToPoliceIdentified() { this.state = 'POLICE_IDENTIFIED'; this._emit(); }
+  advanceToPoliceGuess() { this.state = 'POLICE_GUESS'; this._emit(); }
+
+  suspects() {
+    return this.players.filter(p => p.id !== this.policeId).map(p => p.id);
+  }
+
+  // Only the Police (human or bot) may call this, exactly once per round.
+  submitGuess(suspectId) {
+    if (this.state !== 'POLICE_GUESS') throw new Error('Not in guessing state.');
+    if (this.guessedSuspectId !== null) throw new Error('Guess already submitted.');
+    if (!this.suspects().includes(suspectId)) throw new Error('Invalid suspect.');
+    this.guessedSuspectId = suspectId;
+    this.state = 'RESULT';
+    this._resolveRound();
+    this._emit();
+  }
+
+  _resolveRound() {
+    const correct = this.guessedSuspectId === this.thiefId;
+    const police = this.players.find(p => p.id === this.policeId);
+    const thief = this.players.find(p => p.id === this.thiefId);
+
+    if (correct) {
+      police.roundScore += this.policeRewardPoints;
+    } else {
+      thief.roundScore += this.policeRewardPoints;
+    }
+
+    this.players.forEach(p => {
+      if (p.id === this.policeId || p.id === this.thiefId) return;
+      const card = this.assignment[p.id];
+      const val = typeof card.value === 'number' ? card.value : 0;
+      p.roundScore += val;
+    });
+
+    this.players.forEach(p => { p.score += p.roundScore; });
+
+    this.roundHistory.push({
+      round: this.round,
+      policeId: this.policeId,
+      thiefId: this.thiefId,
+      guessedSuspectId: this.guessedSuspectId,
+      correct,
+      scores: this.players.map(p => ({ id: p.id, name: p.name, roundScore: p.roundScore, total: p.score })),
+    });
+
+    this.correctGuessResult = correct;
+    this.state = 'SCORE_UPDATE';
+  }
+
+  advanceToRoundEnd() { this.state = 'ROUND_END'; this._emit(); }
+
+  hasNextRound() { return this.round < this.numRounds; }
+
+  advanceToNextRoundOrFinal() {
+    if (this.hasNextRound()) {
+      this.state = 'ROUND_START';
+      this._emit();
+      this.startRound();
+    } else {
+      this.state = 'FINAL_RESULT';
+      this._emit();
+    }
+  }
+
+  leaderboard() {
+    return this.players.slice().sort((a, b) => b.score - a.score);
+  }
+
+  winner() { return this.leaderboard()[0]; }
+}
+
+if (typeof window !== 'undefined') {
+  window.CP_Game = { ChorPoliceGame, STATES };
+}
+
+</script>
+<script>
+window.FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAnPkCPNj0mURs4QtaoEoDru5FMc9Ugjpw",
+  authDomain: "chor-police-d6932.firebaseapp.com",
+  projectId: "chor-police-d6932",
+  storageBucket: "chor-police-d6932.firebasestorage.app",
+  messagingSenderId: "182044876485",
+  appId: "1:182044876485:web:a2a3925b71c35a6d33daac",
+};
+</script>
+<script type="module">
+// ============================================================
+// ONLINE.JS — Firebase Firestore real-time multiplayer
+// Uses Firebase v10 modular SDK loaded via <script type="module">
+// in index.html. Anonymous auth gives each browser a stable uid,
+// which security rules use to gate who can read/write what.
+//
+// DATA MODEL
+//   rooms/{code}                     — public room state (safe for
+//                                       everyone in the room to read)
+//   rooms/{code}/secret/current      — thief identity + full deal.
+//                                       Readable ONLY by the host uid.
+//   rooms/{code}/privateCards/{pid}  — one player's own card.
+//                                       Readable ONLY by that uid.
+//
+// HONEST CAVEAT: this is "host-authoritative", not server-authoritative.
+// The host's own browser computes the deal and the result, so a human
+// host who is also playing technically has the info in memory. Firestore
+// rules stop OTHER players from snooping each other's cards or editing
+// scores, which is what matters for friendly play. True cheat-proofing
+// against a malicious host needs a Cloud Function to deal/resolve
+// server-side — see README for the upgrade path.
+// ============================================================
+
+let db = null;
+let auth = null;
+let currentUid = null;
+let fb = null; // holds the imported firestore/auth function bundle
+
+async function initFirebase(config) {
+  const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js');
+  const authMod = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js');
+  const fsMod = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js');
+
+  const app = initializeApp(config);
+  auth = authMod.getAuth(app);
+  db = fsMod.getFirestore(app);
+  fb = { ...authMod, ...fsMod };
+
+  await authMod.signInAnonymously(auth);
+  await new Promise(resolve => {
+    const unsub = authMod.onAuthStateChanged(auth, user => {
+      if (user) { currentUid = user.uid; unsub(); resolve(); }
+    });
+  });
+  return currentUid;
+}
+
+function genRoomCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no ambiguous chars
+  let code = '';
+  for (let i = 0; i < 5; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+async function createRoom(hostName, settings) {
+  const code = genRoomCode();
+  const roomRef = fb.doc(db, 'rooms', code);
+  const hostPlayer = {
+    id: currentUid, name: hostName, avatarSeed: 0, isHost: true,
+    isConnected: true, isBot: false, score: 0, roundScore: 0,
+  };
+  await fb.setDoc(roomRef, {
+    code, hostId: currentUid, state: 'LOBBY', round: 0,
+    numRounds: settings.numRounds, cardDefs: settings.cardDefs,
+    policeRewardPoints: settings.policeRewardPoints ?? 100,
+    minPlayers: 4, maxPlayers: settings.maxPlayers || 8,
+    players: { [currentUid]: hostPlayer },
+    policeId: null, guessedSuspectId: null, result: null,
+    revealedCardsByPlayer: {}, roundHistory: [],
+    createdAt: fb.serverTimestamp(),
+  });
+  return code;
+}
+
+async function joinRoom(code, playerName) {
+  const roomRef = fb.doc(db, 'rooms', code);
+  const snap = await fb.getDoc(roomRef);
+  if (!snap.exists()) throw new Error('Room not found.');
+  const room = snap.data();
+  if (room.state !== 'LOBBY') throw new Error('Game already started.');
+  const playerCount = Object.keys(room.players).length;
+  if (playerCount >= room.maxPlayers) throw new Error('Room is full.');
+
+  const newPlayer = {
+    id: currentUid, name: playerName, avatarSeed: playerCount, isHost: false,
+    isConnected: true, isBot: false, score: 0, roundScore: 0,
+  };
+  await fb.updateDoc(roomRef, { [`players.${currentUid}`]: newPlayer });
+  return currentUid;
+}
+
+function listenToRoom(code, callback) {
+  const roomRef = fb.doc(db, 'rooms', code);
+  return fb.onSnapshot(roomRef, snap => {
+    if (snap.exists()) callback(snap.data());
+  });
+}
+
+function listenToMyPrivateCard(code, callback) {
+  const cardRef = fb.doc(db, 'rooms', code, 'privateCards', currentUid);
+  return fb.onSnapshot(cardRef, snap => {
+    callback(snap.exists() ? snap.data().card : null);
+  });
+}
+
+async function leaveRoom(code) {
+  const roomRef = fb.doc(db, 'rooms', code);
+  await fb.updateDoc(roomRef, { [`players.${currentUid}.isConnected`]: false });
+  // Host migration: if the leaving player was host, hand off to another
+  // connected player. Read-modify-write; fine at friend-group scale.
+  const snap = await fb.getDoc(roomRef);
+  const room = snap.data();
+  if (room.hostId === currentUid) {
+    const nextHost = Object.values(room.players).find(p => p.id !== currentUid && p.isConnected);
+    if (nextHost) {
+      await fb.updateDoc(roomRef, {
+        hostId: nextHost.id,
+        [`players.${nextHost.id}.isHost`]: true,
+      });
+    }
+  }
+}
+
+// ---- HOST-ONLY ACTIONS ----
+// (Firestore rules should also enforce request.auth.uid == resource.data.hostId
+//  for these writes — see firestore.rules in the README.)
+
+async function hostStartGame(code) {
+  const roomRef = fb.doc(db, 'rooms', code);
+  await fb.updateDoc(roomRef, { state: 'ROUND_START' });
+  await hostDealRound(code);
+}
+
+async function hostDealRound(code) {
+  const roomRef = fb.doc(db, 'rooms', code);
+  const snap = await fb.getDoc(roomRef);
+  const room = snap.data();
+  const players = Object.values(room.players).filter(p => p.isConnected);
+  const deck = CP_Cards.buildDeckForPlayerCount(room.cardDefs, players.length);
+  const assignment = CP_Cards.dealCards(players, deck);
+
+  const policeId = players.find(p => assignment[p.id].type === 'police').id;
+  const thiefId = players.find(p => assignment[p.id].type === 'thief').id;
+
+  // Same rule as offline: Police (dedicated card) and the round's highest
+  // numeric card are separate concepts and both get revealed by default.
+  let highestValue = -Infinity;
+  players.forEach(p => {
+    const c = assignment[p.id];
+    if (typeof c.value === 'number' && c.value > highestValue) highestValue = c.value;
+  });
+
+  const revealedCardsByPlayer = {};
+  let highestId = null;
+  players.forEach(p => {
+    const card = assignment[p.id];
+    const isPolice = card.type === 'police';
+    const isHighest = typeof card.value === 'number' && card.value === highestValue && highestValue > 0;
+    if (isHighest) highestId = p.id;
+    revealedCardsByPlayer[p.id] = (isPolice || isHighest || (card.type === 'normal' && card.revealed)) ? card : null;
+  });
+
+  const batch = fb.writeBatch(db);
+  players.forEach(p => {
+    const cardRef = fb.doc(db, 'rooms', code, 'privateCards', p.id);
+    batch.set(cardRef, { card: assignment[p.id] });
+  });
+  const secretRef = fb.doc(db, 'rooms', code, 'secret', 'current');
+  batch.set(secretRef, { thiefId, assignment });
+  batch.update(roomRef, {
+    round: fb.increment(1), state: 'PUBLIC_REVEAL', policeId, highestId, thiefId: null, // thiefId withheld publicly
+    guessedSuspectId: null, result: null, revealedCardsByPlayer,
+  });
+  await batch.commit();
+}
+
+async function submitGuess(code, suspectId) {
+  const roomRef = fb.doc(db, 'rooms', code);
+  const snap = await fb.getDoc(roomRef);
+  const room = snap.data();
+  if (room.policeId !== currentUid) throw new Error('Only the Police can guess.');
+  if (room.guessedSuspectId) throw new Error('Guess already submitted.');
+  await fb.updateDoc(roomRef, { guessedSuspectId: suspectId, state: 'RESULT' });
+  // Host resolves (host listens for state === 'RESULT' and calls hostResolveRound)
+}
+
+async function hostResolveRound(code) {
+  const roomRef = fb.doc(db, 'rooms', code);
+  const secretRef = fb.doc(db, 'rooms', code, 'secret', 'current');
+  const [roomSnap, secretSnap] = await Promise.all([fb.getDoc(roomRef), fb.getDoc(secretRef)]);
+  const room = roomSnap.data();
+  const { thiefId, assignment } = secretSnap.data();
+
+  const correct = room.guessedSuspectId === thiefId;
+  const players = { ...room.players };
+  const policeId = room.policeId;
+
+  Object.values(players).forEach(p => { p.roundScore = 0; });
+  if (correct) players[policeId].roundScore += room.policeRewardPoints;
+  else players[thiefId].roundScore += room.policeRewardPoints;
+
+  Object.values(players).forEach(p => {
+    if (p.id === policeId || p.id === thiefId) return;
+    const card = assignment[p.id];
+    const val = typeof card.value === 'number' ? card.value : 0;
+    p.roundScore += val;
+  });
+  Object.values(players).forEach(p => { p.score += p.roundScore; });
+
+  const roundHistoryEntry = {
+    round: room.round, policeId, thiefId, guessedSuspectId: room.guessedSuspectId, correct,
+    scores: Object.values(players).map(p => ({ id: p.id, name: p.name, roundScore: p.roundScore, total: p.score })),
+  };
+
+  const isFinal = room.round >= room.numRounds;
+  await fb.updateDoc(roomRef, {
+    players, thiefId, result: correct ? 'CORRECT' : 'WRONG',
+    state: isFinal ? 'FINAL_RESULT' : 'SCORE_UPDATE',
+    roundHistory: fb.arrayUnion(roundHistoryEntry),
+  });
+}
+
+async function hostNextRound(code) {
+  await hostDealRound(code);
+}
+
+// ---- CHAT ----
+async function sendChatMessage(code, senderName, text) {
+  const trimmed = (text || '').trim().slice(0, 300);
+  if (!trimmed) return;
+  const msgsRef = fb.collection(db, 'rooms', code, 'messages');
+  await fb.addDoc(msgsRef, {
+    senderId: currentUid, senderName, text: trimmed, ts: fb.serverTimestamp(),
+  });
+}
+
+function listenToChat(code, callback) {
+  const msgsRef = fb.collection(db, 'rooms', code, 'messages');
+  const q = fb.query(msgsRef, fb.orderBy('ts', 'asc'), fb.limit(100));
+  return fb.onSnapshot(q, snap => {
+    callback(snap.docs.map(d => d.data()));
+  });
+}
+
+if (typeof window !== 'undefined') {
+  window.CP_Online = {
+    initFirebase, createRoom, joinRoom, listenToRoom, listenToMyPrivateCard,
+    leaveRoom, hostStartGame, hostDealRound, submitGuess, hostResolveRound, hostNextRound,
+    sendChatMessage, listenToChat,
+    get uid() { return currentUid; },
+  };
+}
+
+</script>
+<script>
+// ============================================================
+// APP.JS — Screen routing + orchestration for both game modes
+// ============================================================
+
+const App = {
+  mode: null, // 'offline' | 'online'
+  cardDefs: null,
+  playerName: 'You',
+  numPlayers: 4,
+  numRounds: 5,
+  policeRewardPoints: 100,
+  botDifficulty: 'normal',
+  game: null, // ChorPoliceGame instance (offline)
+  humanId: 'human_1',
+  // online-specific
+  roomCode: null,
+  myCard: null,
+  unsubRoom: null,
+  unsubCard: null,
+  latestRoom: null,
+  settings: { sfxOn: true, musicOn: true, animOn: true, haptics: true },
+};
+
+function $(sel) { return document.querySelector(sel); }
+function $all(sel) { return Array.from(document.querySelectorAll(sel)); }
+
+function showScreen(id) {
+  $all('.screen').forEach(s => s.classList.remove('active'));
+  $(`#${id}`).classList.add('active');
+}
+
+function haptic(ms = 15) {
+  if (App.settings.haptics && navigator.vibrate) navigator.vibrate(ms);
+}
+
+function bindClick(id, fn) {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', (...args) => { CP_Sound.buttonClick(); haptic(); fn(...args); });
+}
+
+function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ---------------------------------------------------------------
+// INIT
+// ---------------------------------------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+  App.cardDefs = CP_Cards.defaultCardSet();
+  App.selectedNewCardIcon = 'star';
+  renderCardEditor();
+  renderRevealList();
+  renderIconPicker();
+  updateNewCardPreview();
+  wireHome();
+  wireSetup();
+  wireGameScreen();
+  wireSettings();
+  wireOnlineScreens();
+  wireChat();
+  const heroPolice = document.getElementById('hero-police-icon');
+  const heroThief = document.getElementById('hero-thief-icon');
+  if (heroPolice) heroPolice.innerHTML = CP_CardArt.cardIconSvg('police');
+  if (heroThief) heroThief.innerHTML = CP_CardArt.cardIconSvg('thief');
+  refreshIcons();
+  showScreen('screen-home');
+});
+
+function refreshIcons() { if (window.lucide) lucide.createIcons(); }
+
+function renderIconPicker() {
+  const wrap = $('#icon-picker');
+  wrap.innerHTML = CP_CardArt.CUSTOM_ICON_KEYS.map(key =>
+    `<button type="button" class="icon-picker-btn ${key === App.selectedNewCardIcon ? 'selected' : ''}" data-icon="${key}">${CP_CardArt.cardIconSvg(key)}</button>`
+  ).join('');
+  wrap.querySelectorAll('.icon-picker-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      App.selectedNewCardIcon = btn.dataset.icon;
+      wrap.querySelectorAll('.icon-picker-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      updateNewCardPreview();
+    });
+  });
+}
+
+// ---------------------------------------------------------------
+// HOME / MODE SELECT / HOW TO PLAY / SETTINGS
+// ---------------------------------------------------------------
+function wireHome() {
+  bindClick('btn-play-offline', () => { App.mode = 'offline'; showScreen('screen-setup'); $('#setup-online-only').style.display = 'none'; $('#setup-title').textContent = 'Play vs Bots'; });
+  bindClick('btn-play-online', () => { showScreen('screen-online-choice'); });
+  bindClick('btn-how-to-play', () => showScreen('screen-how-to-play'));
+  bindClick('btn-settings', () => showScreen('screen-settings'));
+  $all('.btn-back-home').forEach(b => b.addEventListener('click', () => { CP_Sound.buttonClick(); showScreen('screen-home'); }));
+
+  bindClick('btn-online-create', () => { App.mode = 'online'; showScreen('screen-setup'); $('#setup-online-only').style.display = 'block'; $('#setup-title').textContent = 'Create Room'; });
+  bindClick('btn-online-join', () => showScreen('screen-join'));
+  bindClick('btn-join-submit', async () => {
+    const code = $('#join-room-code').value.trim().toUpperCase();
+    const name = $('#join-player-name').value.trim() || 'Player';
+    if (code.length < 4) return alert('Enter a valid room code.');
+    try {
+      await ensureFirebaseReady();
+      App.playerName = name;
+      App.roomCode = code;
+      await CP_Online.joinRoom(code, name);
+      enterOnlineLobby(code);
+    } catch (e) { alert(e.message); }
+  });
+}
+
+// ---------------------------------------------------------------
+// CARD EDITOR (shared by offline + online setup)
+// ---------------------------------------------------------------
+function renderCardEditor() {
+  const grid = $('#card-list');
+  grid.innerHTML = '';
+  App.cardDefs.forEach(card => {
+    const locked = card.locked;
+    const tile = document.createElement('div');
+    tile.className = `card-tile type-${card.type}`;
+    tile.innerHTML = `
+      ${locked ? '' : `<button class="card-tile-remove" data-id="${card.id}"><i data-lucide="trash-2"></i></button>`}
+      <div class="card-tile-icon">${CP_CardArt.cardIconSvg(card.icon)}</div>
+      <input class="card-tile-name" type="text" value="${card.name}" ${locked ? 'disabled' : ''} data-id="${card.id}" data-field="name">
+      <input class="card-tile-value" type="${card.type === 'police' ? 'text' : 'number'}" value="${card.value}" ${card.type !== 'normal' ? 'disabled' : ''} data-id="${card.id}" data-field="value">
+    `;
+    grid.appendChild(tile);
+  });
+
+  grid.querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('change', e => {
+      const { id, field } = e.target.dataset;
+      const card = App.cardDefs.find(c => c.id === id);
+      if (field === 'value') card.value = Number(e.target.value);
+      else card.name = e.target.value;
+      renderRevealList();
+    });
+  });
+  grid.querySelectorAll('.card-tile-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      App.cardDefs = App.cardDefs.filter(c => c.id !== btn.dataset.id);
+      renderCardEditor();
+      renderRevealList();
+    });
+  });
+  refreshIcons();
+}
+
+function renderRevealList() {
+  const wrap = $('#reveal-list');
+  if (!wrap) return;
+  wrap.innerHTML = App.cardDefs.map(card => {
+    if (card.type === 'police') {
+      return `<div class="reveal-row locked"><span>${escapeHtml(card.name)}</span><span class="reveal-tag always">Always shown</span></div>`;
+    }
+    if (card.type === 'thief') {
+      return `<div class="reveal-row locked"><span>${escapeHtml(card.name)}</span><span class="reveal-tag never">Never revealed</span></div>`;
+    }
+    return `<div class="reveal-row"><span>${escapeHtml(card.name)}</span><input type="checkbox" class="switch" ${card.revealed ? 'checked' : ''} data-id="${card.id}"></div>`;
+  }).join('');
+  wrap.querySelectorAll('input[type=checkbox]').forEach(inp => {
+    inp.addEventListener('change', e => {
+      const card = App.cardDefs.find(c => c.id === e.target.dataset.id);
+      if (card) card.revealed = e.target.checked;
+    });
+  });
+}
+
+function updateNewCardPreview() {
+  const preview = $('#new-card-preview');
+  if (!preview) return;
+  const name = $('#new-card-name').value.trim() || 'New Card';
+  const value = Number($('#new-card-value').value) || 0;
+  const icon = App.selectedNewCardIcon || 'star';
+  preview.innerHTML = cardFaceHtml({ name, value, icon, type: 'normal' });
+}
+
+function wireSetup() {
+  bindClick('btn-add-card', () => {
+    const name = $('#new-card-name').value.trim();
+    const value = Number($('#new-card-value').value);
+    if (!name || Number.isNaN(value)) return alert('Enter a card name and numeric value.');
+    App.cardDefs.push({ id: CP_Cards.makeId('card'), name, value, icon: App.selectedNewCardIcon || 'star', type: 'normal', revealed: false });
+    $('#new-card-name').value = ''; $('#new-card-value').value = '';
+    renderCardEditor();
+    renderRevealList();
+    updateNewCardPreview();
+  });
+  $('#new-card-name').addEventListener('input', updateNewCardPreview);
+  $('#new-card-value').addEventListener('input', updateNewCardPreview);
+
+  bindClick('btn-players-minus', () => setPlayerCount(App.numPlayers - 1));
+  bindClick('btn-players-plus', () => setPlayerCount(App.numPlayers + 1));
+  bindClick('btn-rounds-minus', () => setRoundCount(App.numRounds - 1));
+  bindClick('btn-rounds-plus', () => setRoundCount(App.numRounds + 1));
+
+  bindClick('btn-setup-continue', () => {
+    App.numRounds = Number($('#rounds-count').textContent);
+    App.policeRewardPoints = Number($('#police-reward').value) || 100;
+    App.botDifficulty = $('#bot-difficulty').value;
+    App.settings.animOn = $('#toggle-3d').checked;
+    App.settings.sfxOn = $('#toggle-sfx').checked;
+    App.settings.musicOn = $('#toggle-music').checked;
+    CP_Sound.setSfxOn(App.settings.sfxOn);
+    CP_Sound.setMusicOn(App.settings.musicOn);
+
+    if (App.cardDefs.length < 3) return alert('Add at least one custom card besides Police & Thief.');
+
+    if (App.mode === 'offline') startOfflineGame();
+    else createOnlineRoomFlow();
+  });
+
+  setPlayerCount(4);
+  setRoundCount(5);
+}
+
+function setPlayerCount(n) {
+  App.numPlayers = Math.max(4, Math.min(10, n));
+  $('#players-count').textContent = App.numPlayers;
+}
+function setRoundCount(n) {
+  App.numRounds = Math.max(1, Math.min(20, n));
+  $('#rounds-count').textContent = App.numRounds;
+}
+
+// ---------------------------------------------------------------
+// SHARED BOARD RENDERING (used by both offline + online modes)
+// ---------------------------------------------------------------
+
+// Evenly spaces `n` seats around an ellipse inscribed in the table.
+function positionsForPlayers(n) {
+  const rx = 42, ry = 37; // percent of table box
+  const positions = [];
+  for (let i = 0; i < n; i++) {
+    const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+    positions.push({ x: 50 + rx * Math.cos(angle), y: 50 + ry * Math.sin(angle) });
+  }
+  return positions;
+}
+
+function setBoardStatus(html) { $('#board-status').innerHTML = html; }
+
+function cardFaceHtml(card, extraClass = '') {
+  const valueBadge = typeof card.value === 'number'
+    ? `<div class="card-value">${card.value}</div>`
+    : `<div class="card-value card-value-special">${CP_CardArt.cardIconSvg('star')}</div>`;
+  return `<div class="card-face type-${card.type} ${extraClass}">
+    <div class="card-art">${CP_CardArt.cardIconSvg(card.icon)}</div>
+    <div class="card-name">${escapeHtml(card.name)}</div>
+    ${valueBadge}
+  </div>`;
+}
+
+// options: { players, myId, revealedCardsByPlayer, policeId, thiefId, selectable, myCard, animateDeal }
+// Rotates the player order so "me" always lands in the bottom seat —
+// closest to the viewer, matching how Ludo Star / Carrom Pool always
+// anchor your own position at the bottom of the board.
+function orderPlayersWithMeAtBottom(players, myId) {
+  const n = players.length;
+  const meIdx = players.findIndex(p => p.id === myId);
+  if (meIdx === -1) return players;
+  const bottomIdx = Math.round(n / 2) % n;
+  const shift = (meIdx - bottomIdx + n) % n;
+  const rotated = new Array(n);
+  for (let k = 0; k < n; k++) rotated[k] = players[(k + shift) % n];
+  return rotated;
+}
+
+function renderBoard(opts) {
+  const {
+    players, myId, revealedCardsByPlayer = {}, policeId = null, thiefId = null, highestId = null,
+    selectable = false, myCard = null, animateDeal = false, centerMode = 'idle', thinkingId = null,
+  } = opts;
+  const table = $('#game-table');
+  const centerHtml = centerMode === 'shuffle'
+    ? `<div class="shuffle-deck"><div class="deck-card"></div><div class="deck-card"></div><div class="deck-card"></div></div>`
+    : `<div class="idle-deck"><div class="deck-card"></div><div class="deck-card"></div><div class="deck-card"></div></div>`;
+  table.innerHTML = `<div class="table-center" id="table-center">${centerHtml}</div>`;
+
+  const ordered = orderPlayersWithMeAtBottom(players, myId);
+  const positions = positionsForPlayers(ordered.length);
+  ordered.forEach((p, i) => {
+    const pos = positions[i];
+    const isMe = p.id === myId;
+    const revealed = revealedCardsByPlayer[p.id];
+    const card = isMe ? myCard : revealed;
+    const isPolice = p.id === policeId;
+    const isThiefRevealed = thiefId && p.id === thiefId;
+    const isHighest = highestId && p.id === highestId && !isPolice;
+    const isThinking = thinkingId && p.id === thinkingId;
+
+    const slot = document.createElement('div');
+    slot.className = 'player-slot'
+      + (isPolice ? ' is-police' : '')
+      + (isThiefRevealed ? ' is-thief-revealed' : '')
+      + (isThinking ? ' is-thinking' : '')
+      + (isMe ? ' is-me' : '')
+      + (selectable && p.id !== policeId ? ' selectable' : '');
+    slot.style.left = pos.x + '%';
+    slot.style.top = pos.y + '%';
+    slot.dataset.pid = p.id;
+
+    if (animateDeal) {
+      const dx = (50 - pos.x) * 3.6;
+      const dy = (50 - pos.y) * 3.6;
+      slot.style.setProperty('--dx', dx + 'px');
+      slot.style.setProperty('--dy', dy + 'px');
+      slot.style.animationDelay = (i * 0.12) + 's';
+      slot.classList.add('deal-anim');
+    }
+
+    slot.innerHTML = `
+      ${isPolice ? `<div class="slot-badge">${CP_CardArt.cardIconSvg('police')}</div>` : ''}
+      ${isHighest ? `<div class="slot-badge-secondary">${CP_CardArt.cardIconSvg('star')}</div>` : ''}
+      ${isThinking ? `<div class="slot-thinking"><span></span><span></span><span></span></div>` : ''}
+      <div class="slot-avatar-wrap"><div class="slot-avatar">${CP_AvatarArt.avatarSvg(p.avatarSeed ?? p.id)}</div></div>
+      <div class="slot-name">${escapeHtml(p.name)}${isMe ? ' (You)' : ''}</div>
+      <div class="slot-score">${p.score ?? 0}</div>
+      <div class="mini-card ${card ? 'flip-in' : 'card-back'}">${card ? cardFaceHtml(card) : '<div class="card-back-face"></div>'}</div>
+    `;
+    table.appendChild(slot);
+  });
+
+  if (selectable) {
+    table.querySelectorAll('.player-slot.selectable').forEach(slotEl => {
+      slotEl.addEventListener('click', () => onSuspectTap(slotEl.dataset.pid, slotEl));
+    });
+  }
+}
+
+function onSuspectTap(pid, el) {
+  CP_Sound.selecting(); haptic();
+  $('#game-table').querySelectorAll('.player-slot.selected').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  const name = el.querySelector('.slot-name').textContent;
+  $('#confirm-suspect-name').textContent = name;
+  $('#guess-confirm').classList.add('active');
+  $('#btn-catch-him').onclick = async () => {
+    $('#guess-confirm').classList.remove('active');
+    if (App.mode === 'offline') submitOfflineGuess(pid);
+    else await CP_Online.submitGuess(App.roomCode, pid);
+  };
+  $('#btn-cancel-guess').onclick = () => { $('#guess-confirm').classList.remove('active'); el.classList.remove('selected'); };
+}
+
+function renderRoundBanner({ round, numRounds }) {
+  $('#round-banner').textContent = `ROUND ${round} / ${numRounds}`;
+}
+
+function renderScoreboardFromEntry(entry) {
+  const police = entry.scores.find(s => s.id === entry.policeId);
+  const thief = entry.scores.find(s => s.id === entry.thiefId);
+  const others = entry.scores.filter(s => s.id !== entry.policeId && s.id !== entry.thiefId);
+
+  const outcomeHtml = entry.correct
+    ? `<div class="outcome-banner correct">THIEF CAUGHT!<span class="outcome-sub">${escapeHtml(police.name)}'s guess was right. ${escapeHtml(thief.name)} was the Thief.</span></div>`
+    : `<div class="outcome-banner wrong">THIEF ESCAPED!<span class="outcome-sub">${escapeHtml(police.name)}'s guess was wrong. ${escapeHtml(thief.name)} was the Thief.</span></div>`;
+
+  const roleBoxes = `<div class="role-box-row">
+    <div class="role-box ${entry.correct ? 'highlight' : ''}"><div class="role-box-label">${escapeHtml(police.name)} (Police)</div><div class="role-box-score">+${police.roundScore}</div></div>
+    <div class="role-box ${!entry.correct ? 'highlight' : ''}"><div class="role-box-label">${escapeHtml(thief.name)} (Thief)</div><div class="role-box-score">+${thief.roundScore}</div></div>
+  </div>`;
+
+  const othersHtml = others.length ? `<div class="others-earned">
+    <div class="others-earned-title">Others Earned According to Their Cards</div>
+    <div class="others-earned-row">${others.map(s => `<div class="others-chip">${escapeHtml(s.name)}<span>+${s.roundScore}</span></div>`).join('')}</div>
+  </div>` : '';
+
+  const totalsHtml = `<div class="score-totals">${entry.scores.slice().sort((a, b) => b.total - a.total)
+    .map(s => `<div class="score-row"><span>${escapeHtml(s.name)}</span><span class="score-delta">+${s.roundScore}</span><span class="score-total">${s.total}</span></div>`).join('')}</div>`;
+
+  const titleHtml = `<div class="panel-title">ROUND ${entry.round} RESULTS</div>`;
+  $('#scoreboard-body').innerHTML = titleHtml + outcomeHtml + roleBoxes + othersHtml + totalsHtml;
+}
+
+function showStage(id) {
+  $all('.stage').forEach(s => s.classList.remove('active'));
+  $(`#${id}`).classList.add('active');
+}
+
+function showFinalResults(leaderboard, winner) {
+  showStage('stage-final');
+  CP_Sound.victory();
+  $('#final-trophy').innerHTML = CP_CardArt.cardIconSvg('trophy');
+  $('#final-medallion').innerHTML = CP_AvatarArt.avatarSvg(winner.avatarSeed ?? winner.id);
+  $('#final-ribbon').innerHTML = `<div class="ribbon-name">${escapeHtml(winner.name.toUpperCase())}</div><div class="ribbon-sub">CHOR POLICE CHAMPION!</div>`;
+  $('#final-list').innerHTML = leaderboard.map((p, i) => {
+    const rankBadge = i === 0
+      ? `<span class="final-medal">${CP_CardArt.cardIconSvg('trophy')}</span>`
+      : `<span class="final-rank">${i + 1}.</span>`;
+    return `<div class="final-row ${i === 0 ? 'winner' : ''}"><span>${rankBadge} ${escapeHtml(p.name)}</span><span>${p.score}</span></div>`;
+  }).join('');
+}
+
+function wireGameScreen() {
+  bindClick('btn-play-again', () => {
+    if (App.mode === 'offline') startOfflineGame();
+    else { cleanupOnlineListeners(); showScreen('screen-home'); }
+  });
+  bindClick('btn-final-home', () => {
+    CP_Sound.stopMusic();
+    if (App.mode === 'online') cleanupOnlineListeners();
+    showScreen('screen-home');
+  });
+}
+
+function wireSettings() {
+  bindClick('btn-settings-rules', () => showScreen('screen-how-to-play'));
+  bindClick('btn-settings-about', () => alert('Chor Police — a classic bluffing & deduction game.\n\nBuilt with plain HTML/CSS/JS, real-time Firebase multiplayer, and original hand-drawn artwork.'));
+  const s = App.settings;
+  const syncAll = () => {
+    $('#toggle-sfx').checked = s.sfxOn; $('#toggle-sfx-settings').checked = s.sfxOn;
+    $('#toggle-music').checked = s.musicOn; $('#toggle-music-settings').checked = s.musicOn;
+    $('#toggle-3d').checked = s.animOn; $('#toggle-3d-settings').checked = s.animOn;
+    $('#toggle-haptics').checked = s.haptics;
+  };
+  syncAll();
+
+  // Setup-screen toggles (per-game, shown before starting a match)
+  $('#toggle-sfx').addEventListener('change', e => { s.sfxOn = e.target.checked; CP_Sound.setSfxOn(s.sfxOn); syncAll(); });
+  $('#toggle-music').addEventListener('change', e => { s.musicOn = e.target.checked; CP_Sound.setMusicOn(s.musicOn); syncAll(); });
+  $('#toggle-3d').addEventListener('change', e => { s.animOn = e.target.checked; syncAll(); });
+
+  // Settings-screen toggles (global, reachable from the home screen)
+  $('#toggle-sfx-settings').addEventListener('change', e => { s.sfxOn = e.target.checked; CP_Sound.setSfxOn(s.sfxOn); syncAll(); });
+  $('#toggle-music-settings').addEventListener('change', e => { s.musicOn = e.target.checked; CP_Sound.setMusicOn(s.musicOn); syncAll(); });
+  $('#toggle-3d-settings').addEventListener('change', e => { s.animOn = e.target.checked; syncAll(); });
+  $('#toggle-haptics').addEventListener('change', e => { s.haptics = e.target.checked; });
+
+  $('#sfx-volume').addEventListener('input', e => CP_Sound.setSfxVolume(Number(e.target.value)));
+  $('#music-volume').addEventListener('input', e => CP_Sound.setMusicVolume(Number(e.target.value)));
+}
+
+// ---------------------------------------------------------------
+// OFFLINE MODE
+// ---------------------------------------------------------------
+function startOfflineGame() {
+  const botNames = CP_Bots.pickBotNames(App.numPlayers - 1);
+  const players = [
+    { id: App.humanId, name: App.playerName || 'You', avatarSeed: 0, isHost: true, isBot: false },
+    ...botNames.map((name, i) => ({ id: `bot_${i}`, name, avatarSeed: i + 1, isHost: false, isBot: true, botDifficulty: App.botDifficulty })),
+  ];
+  App.game = new CP_Game.ChorPoliceGame({
+    players, cardDefs: App.cardDefs, numRounds: App.numRounds, policeRewardPoints: App.policeRewardPoints,
+  });
+  showScreen('screen-game');
+  showStage('stage-board');
+  CP_Sound.startMusic();
+  App.game.startRound();
+  runOfflineRoundSequence();
+}
+
+async function runOfflineRoundSequence() {
+  const game = App.game;
+  showStage('stage-board');
+  renderRoundBanner(game);
+
+  setBoardStatus('Shuffling the deck…');
+  renderBoard({ players: game.players, myId: App.humanId, centerMode: 'shuffle' });
+  CP_Sound.cardShuffle();
+  await wait(App.settings.animOn ? 1400 : 250);
+
+  game.advanceToDealing();
+  setBoardStatus('Dealing cards…');
+  renderBoard({ players: game.players, myId: App.humanId, myCard: game.assignment[App.humanId], animateDeal: App.settings.animOn });
+  CP_Sound.cardDeal();
+  await wait(App.settings.animOn ? 1200 : 250);
+
+  game.advanceToPublicReveal();
+  const { revealedCardsByPlayer, highestId } = game.publicRevealState();
+  setBoardStatus('Revealing public cards…');
+  renderBoard({ players: game.players, myId: App.humanId, myCard: game.assignment[App.humanId], revealedCardsByPlayer, policeId: game.policeId, highestId });
+  CP_Sound.cardFlip();
+  await wait(900);
+
+  game.advanceToPoliceIdentified();
+  CP_Sound.policeIdentified();
+  const police = game.players.find(p => p.id === game.policeId);
+  setBoardStatus(police.id === App.humanId ? 'YOU ARE THE POLICE' : `${escapeHtml(police.name).toUpperCase()} IS THE POLICE`);
+  await wait(1400);
+
+  game.advanceToPoliceGuess();
+  if (game.policeId === App.humanId) {
+    setBoardStatus('WHO IS THE THIEF? Tap a player.');
+    renderBoard({ players: game.players, myId: App.humanId, myCard: game.assignment[App.humanId], revealedCardsByPlayer, policeId: game.policeId, highestId, selectable: true });
+  } else {
+    setBoardStatus(`${escapeHtml(police.name)} is deciding...`);
+    renderBoard({ players: game.players, myId: App.humanId, myCard: game.assignment[App.humanId], revealedCardsByPlayer, policeId: game.policeId, highestId, thinkingId: police.id });
+    await wait(1400);
+    const suspects = game.suspects();
+    const publicInfo = game.publicRevealState();
+    const suspectId = CP_Bots.botChooseSuspect(police.id, suspects, publicInfo, police.botDifficulty || 'normal');
+    submitOfflineGuess(suspectId);
+  }
+}
+
+function submitOfflineGuess(suspectId) {
+  const game = App.game;
+  game.submitGuess(suspectId);
+  const { revealedCardsByPlayer, highestId } = game.publicRevealState();
+  renderBoard({ players: game.players, myId: App.humanId, myCard: game.assignment[App.humanId], revealedCardsByPlayer, policeId: game.policeId, thiefId: game.thiefId, highestId });
+
+  const thief = game.players.find(p => p.id === game.thiefId);
+  const police = game.players.find(p => p.id === game.policeId);
+  if (game.correctGuessResult) {
+    setBoardStatus(`THIEF CAUGHT! ${escapeHtml(thief.name)} was the Thief. ${escapeHtml(police.name)} +${game.policeRewardPoints}`);
+    CP_Sound.correctGuess();
+    burstConfetti();
+  } else {
+    setBoardStatus(`THIEF ESCAPED! ${escapeHtml(thief.name)} was the Thief. +${game.policeRewardPoints}`);
+    CP_Sound.wrongGuess();
+  }
+
+  setTimeout(() => {
+    game.advanceToRoundEnd();
+    showStage('stage-scoreboard');
+    renderScoreboardFromEntry(game.roundHistory[game.roundHistory.length - 1]);
+    CP_Sound.roundComplete();
+
+    setTimeout(() => {
+      if (game.hasNextRound()) {
+        game.advanceToNextRoundOrFinal();
+        runOfflineRoundSequence();
+      } else {
+        game.state = 'FINAL_RESULT';
+        showFinalResults(game.leaderboard(), game.winner());
+      }
+    }, 3200);
+  }, 2400);
+}
+
+// ---------------------------------------------------------------
+// ONLINE MODE
+// ---------------------------------------------------------------
+let firebaseReady = false;
+async function ensureFirebaseReady() {
+  if (firebaseReady) return;
+  if (!window.FIREBASE_CONFIG || !window.FIREBASE_CONFIG.apiKey) {
+    throw new Error('Firebase isn\'t configured yet — add your project keys to js/firebase-config.js.');
+  }
+  await CP_Online.initFirebase(window.FIREBASE_CONFIG);
+  firebaseReady = true;
+}
+
+function wireOnlineScreens() {
+  bindClick('btn-lobby-start', async () => {
+    if (!App.latestRoom || App.latestRoom.hostId !== CP_Online.uid) return;
+    await CP_Online.hostStartGame(App.roomCode);
+  });
+  bindClick('btn-lobby-copy', () => {
+    navigator.clipboard?.writeText(App.roomCode);
+    $('#btn-lobby-copy').textContent = 'Copied!';
+    setTimeout(() => { $('#btn-lobby-copy').textContent = 'Copy Code'; }, 1200);
+  });
+  bindClick('btn-lobby-leave', async () => {
+    await CP_Online.leaveRoom(App.roomCode);
+    cleanupOnlineListeners();
+    showScreen('screen-home');
+  });
+}
+
+async function createOnlineRoomFlow() {
+  try {
+    await ensureFirebaseReady();
+    const code = await CP_Online.createRoom(App.playerName || 'Host', {
+      numRounds: App.numRounds, cardDefs: App.cardDefs, policeRewardPoints: App.policeRewardPoints,
+      maxPlayers: 10,
+    });
+    App.roomCode = code;
+    enterOnlineLobby(code);
+  } catch (e) { alert(e.message); }
+}
+
+function enterOnlineLobby(code) {
+  showScreen('screen-lobby');
+  $('#lobby-room-code').textContent = code;
+
+  App.unsubRoom = CP_Online.listenToRoom(code, room => {
+    App.latestRoom = room;
+    if (room.state === 'LOBBY') renderLobby(room);
+    else driveOnlineGame(room);
+  });
+  App.unsubCard = CP_Online.listenToMyPrivateCard(code, card => { App.myCard = card; });
+  App.unsubChat = CP_Online.listenToChat(code, renderChatMessages);
+  App._lastChatCount = 0;
+  App._chatInitialized = false;
+  showChatFab();
+}
+
+function renderLobby(room) {
+  const players = Object.values(room.players).filter(p => p.isConnected);
+  $('#lobby-players-count').textContent = `${players.length} / ${room.maxPlayers}`;
+  $('#lobby-rounds').textContent = room.numRounds;
+  $('#lobby-player-list').innerHTML = players.map(p =>
+    `<div class="lobby-player">
+      <span class="lobby-player-avatar">${CP_AvatarArt.avatarSvg(p.avatarSeed ?? p.id)}</span>
+      <span class="lobby-player-name">${escapeHtml(p.name)}${p.id === CP_Online.uid ? ' (You)' : ''}</span>
+      ${p.isHost ? '<i data-lucide="crown"></i>' : '<span class="lobby-ready-tag">Ready</span>'}
+    </div>`
+  ).join('');
+  const isHost = room.hostId === CP_Online.uid;
+  $('#btn-lobby-start').style.display = isHost ? 'block' : 'none';
+  $('#lobby-waiting-text').style.display = isHost ? 'none' : 'block';
+  $('#btn-lobby-start').disabled = players.length < 4;
+  refreshIcons();
+}
+
+let lastRenderedState = null;
+let lastRenderedRound = null;
+
+async function driveOnlineGame(room) {
+  if (!document.getElementById('screen-game').classList.contains('active')) {
+    showScreen('screen-game');
+    CP_Sound.startMusic();
+  }
+  showStage('stage-board');
+  renderRoundBanner({ round: room.round, numRounds: room.numRounds });
+
+  const stateChanged = room.state !== lastRenderedState || room.round !== lastRenderedRound;
+  lastRenderedState = room.state; lastRenderedRound = room.round;
+
+  const players = Object.values(room.players).filter(p => p.isConnected);
+
+  if (room.state === 'PUBLIC_REVEAL') {
+    if (!stateChanged) return;
+    setBoardStatus('Dealing cards…');
+    renderBoard({ players, myId: CP_Online.uid, myCard: App.myCard, animateDeal: App.settings.animOn });
+    CP_Sound.cardDeal();
+    await wait(App.settings.animOn ? 1000 : 200);
+
+    setBoardStatus('Revealing public cards…');
+    renderBoard({ players, myId: CP_Online.uid, myCard: App.myCard, revealedCardsByPlayer: room.revealedCardsByPlayer, policeId: room.policeId, highestId: room.highestId });
+    CP_Sound.cardFlip();
+    await wait(900);
+
+    const police = players.find(p => p.id === room.policeId);
+    CP_Sound.policeIdentified();
+    setBoardStatus(police ? (police.id === CP_Online.uid ? 'YOU ARE THE POLICE' : `${escapeHtml(police.name).toUpperCase()} IS THE POLICE`) : '');
+    await wait(1400);
+
+    if (room.policeId === CP_Online.uid) {
+      setBoardStatus('WHO IS THE THIEF? Tap a player.');
+      renderBoard({ players, myId: CP_Online.uid, myCard: App.myCard, revealedCardsByPlayer: room.revealedCardsByPlayer, policeId: room.policeId, highestId: room.highestId, selectable: true });
+    } else {
+      setBoardStatus(`${police ? escapeHtml(police.name) : 'Police'} is deciding...`);
+      renderBoard({ players, myId: CP_Online.uid, myCard: App.myCard, revealedCardsByPlayer: room.revealedCardsByPlayer, policeId: room.policeId, highestId: room.highestId, thinkingId: room.policeId });
+    }
+    return;
+  }
+
+  if (room.state === 'RESULT') {
+    if (room.hostId === CP_Online.uid) await CP_Online.hostResolveRound(App.roomCode);
+    return; // wait for the resulting snapshot to re-trigger this function
+  }
+
+  if (room.state === 'SCORE_UPDATE' || room.state === 'FINAL_RESULT') {
+    if (!stateChanged) return;
+    const police = players.find(p => p.id === room.policeId);
+    const thief = players.find(p => p.id === room.thiefId);
+    const correct = room.result === 'CORRECT';
+
+    renderBoard({ players, myId: CP_Online.uid, myCard: App.myCard, revealedCardsByPlayer: room.revealedCardsByPlayer, policeId: room.policeId, thiefId: room.thiefId, highestId: room.highestId });
+    if (police && thief) {
+      setBoardStatus(correct
+        ? `THIEF CAUGHT! ${escapeHtml(thief.name)} was the Thief. ${escapeHtml(police.name)} +${room.policeRewardPoints}`
+        : `THIEF ESCAPED! ${escapeHtml(thief.name)} was the Thief. +${room.policeRewardPoints}`);
+    }
+    correct ? CP_Sound.correctGuess() : CP_Sound.wrongGuess();
+    if (correct) burstConfetti();
+
+    setTimeout(() => {
+      showStage('stage-scoreboard');
+      const last = room.roundHistory[room.roundHistory.length - 1];
+      renderScoreboardFromEntry(last);
+      CP_Sound.roundComplete();
+
+      if (room.state === 'FINAL_RESULT') {
+        const sorted = Object.values(room.players).sort((a, b) => b.score - a.score);
+        setTimeout(() => showFinalResults(sorted, sorted[0]), 3000);
+      } else if (room.hostId === CP_Online.uid) {
+        setTimeout(() => CP_Online.hostNextRound(App.roomCode), 3200);
+      }
+    }, 2400);
+  }
+}
+
+function cleanupOnlineListeners() {
+  if (App.unsubRoom) App.unsubRoom();
+  if (App.unsubCard) App.unsubCard();
+  if (App.unsubChat) App.unsubChat();
+  App.unsubRoom = null; App.unsubCard = null; App.unsubChat = null;
+  hideChatFab();
+}
+
+// ---------------------------------------------------------------
+// CHAT (online rooms only)
+// ---------------------------------------------------------------
+function wireChat() {
+  bindClick('btn-chat-toggle', () => {
+    $('#chat-panel').classList.add('active');
+    $('#btn-chat-toggle').classList.remove('has-unread');
+    const wrap = $('#chat-messages');
+    wrap.scrollTop = wrap.scrollHeight;
+  });
+  bindClick('btn-chat-close', () => $('#chat-panel').classList.remove('active'));
+  bindClick('btn-chat-send', sendChat);
+  $('#chat-input').addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
+}
+
+function sendChat() {
+  const input = $('#chat-input');
+  const text = input.value.trim();
+  if (!text || !App.roomCode) return;
+  input.value = '';
+  CP_Online.sendChatMessage(App.roomCode, App.playerName || 'Player', text).catch(() => {});
+}
+
+function showChatFab() { $('#btn-chat-toggle').style.display = 'flex'; }
+function hideChatFab() { $('#btn-chat-toggle').style.display = 'none'; $('#chat-panel').classList.remove('active'); }
+
+function renderChatMessages(messages) {
+  const wrap = $('#chat-messages');
+  const nearBottom = wrap.scrollHeight - wrap.scrollTop - wrap.clientHeight < 60;
+  const prevCount = App._lastChatCount || 0;
+  const newMessages = messages.slice(prevCount);
+  App._lastChatCount = messages.length;
+
+  wrap.innerHTML = messages.map(m => {
+    const mine = m.senderId === CP_Online.uid;
+    return `<div class="chat-msg ${mine ? 'mine' : ''}">
+      ${mine ? '' : `<div class="chat-msg-name">${escapeHtml(m.senderName || 'Player')}</div>`}
+      <div class="chat-msg-bubble">${escapeHtml(m.text)}</div>
+    </div>`;
+  }).join('');
+
+  if (nearBottom || !$('#chat-panel').classList.contains('active')) wrap.scrollTop = wrap.scrollHeight;
+
+  // Pop a toast for every genuinely new message, for everyone in the room —
+  // but not on first subscribe (that would dump the whole history as toasts).
+  if (App._chatInitialized) {
+    newMessages.forEach(m => {
+      const mine = m.senderId === CP_Online.uid;
+      showChatToast(mine ? 'You' : (m.senderName || 'Player'), m.text, mine);
+      if (!mine && !$('#chat-panel').classList.contains('active')) {
+        $('#btn-chat-toggle').classList.add('has-unread');
+      }
+    });
+  }
+  App._chatInitialized = true;
+}
+
+function showChatToast(name, text, isMine) {
+  const layer = $('#chat-toast-layer');
+  if (!layer) return;
+  const toast = document.createElement('div');
+  toast.className = 'chat-toast' + (isMine ? ' mine' : '');
+  toast.innerHTML = `<strong>${escapeHtml(name)}</strong><span>${escapeHtml(text)}</span>`;
+  layer.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('leaving');
+    setTimeout(() => toast.remove(), 320);
+  }, 3500);
+}
+
+// ---------------------------------------------------------------
+// CELEBRATION FX
+// ---------------------------------------------------------------
+function burstConfetti() {
+  if (!App.settings.animOn) return;
+  const table = $('#game-table');
+  if (!table) return;
+  const colors = ['#e8b74d', '#f2cf7e', '#4caf7d', '#d9634f', '#fff3d6'];
+  const layer = document.createElement('div');
+  layer.className = 'confetti-layer';
+  for (let i = 0; i < 26; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 60 + Math.random() * 90;
+    piece.style.setProperty('--cx', Math.cos(angle) * dist + 'px');
+    piece.style.setProperty('--cy', Math.sin(angle) * dist + 'px');
+    piece.style.setProperty('--cr', (Math.random() * 360) + 'deg');
+    piece.style.background = colors[i % colors.length];
+    piece.style.animationDelay = (Math.random() * 0.15) + 's';
+    layer.appendChild(piece);
+  }
+  table.appendChild(layer);
+  setTimeout(() => layer.remove(), 1200);
+}
+
+</script>
+</body>
+</html>
